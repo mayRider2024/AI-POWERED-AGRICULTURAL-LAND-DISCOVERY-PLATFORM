@@ -42,14 +42,14 @@ def list_properties(
     if max_price_per_guntha is not None:
         query = query.filter(models.PropertyListing.price_per_guntha <= max_price_per_guntha)
     items = query.all()
-    return {"properties": [PropertyResponse.from_orm(p) for p in items]}
+    return {"properties": [PropertyResponse.model_validate(p) for p in items]}
 
 @router.get("/{property_id}", response_model=PropertyResponse)
 def get_property(property_id: int, db: Session = Depends(get_db)):
     prop = db.query(models.PropertyListing).filter(models.PropertyListing.id == property_id).first()
     if not prop:
         raise HTTPException(status_code=404, detail="Property not found")
-    return PropertyResponse.from_orm(prop)
+    return PropertyResponse.model_validate(prop)
 
 @router.get("/nearby", response_model=PropertyListResponse)
 def nearby_properties(
@@ -61,5 +61,5 @@ def nearby_properties(
     point_wkt = f"POINT({longitude} {latitude})"
     query = db.query(models.PropertyListing)
     items = query.all()
-    return {"properties": [PropertyResponse.from_orm(p) for p in items]}
+    return {"properties": [PropertyResponse.model_validate(p) for p in items]}
 
