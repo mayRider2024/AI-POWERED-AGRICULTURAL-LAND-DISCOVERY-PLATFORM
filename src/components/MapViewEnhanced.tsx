@@ -28,18 +28,27 @@ export default function MapViewEnhanced() {
   const [filterVillage, setFilterVillage] = useState('');
   const [minArea, setMinArea] = useState<number | ''>('');
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
+  const [maxRoadDist, setMaxRoadDist] = useState<number | ''>('');
   const [showFilters, setShowFilters] = useState(false);
+  const [mapStyle, setMapStyle] = useState<'liberty' | 'positron' | 'bright'>('liberty');
 
   const { savedIds, toggleSave } = useSaved();
 
   const filteredProperties = properties.filter((p) => {
     if (filterDistrict && p.district !== filterDistrict) return false;
-    if (filterTaluka && p.taluka !== filterTaluka) return false;
-    if (filterVillage && p.village !== filterVillage) return false;
+    if (filterTaluka && p.taluka.toLowerCase() !== filterTaluka.toLowerCase()) return false;
+    if (filterVillage && p.village.toLowerCase() !== filterVillage.toLowerCase()) return false;
     if (minArea !== '' && p.areaAcres < Number(minArea)) return false;
     if (maxPrice !== '' && p.totalPrice > Number(maxPrice)) return false;
+    if (maxRoadDist !== '' && p.roadDistanceMeters && p.roadDistanceMeters > Number(maxRoadDist)) return false;
     return true;
   });
+
+  const styleUrls = {
+    liberty: 'https://tiles.openfreemap.org/styles/liberty',
+    positron: 'https://tiles.openfreemap.org/styles/positron',
+    bright: 'https://tiles.openfreemap.org/styles/bright',
+  };
 
   const initMap = () => {
     if (!mapContainer.current) return;
@@ -53,12 +62,12 @@ export default function MapViewEnhanced() {
     setIsLoading(true);
     setMapError(null);
 
-    // Use OpenFreeMap's Liberty style — free, reliable, no API key needed
+    // OpenFreeMap style: liberty, positron, or bright — legitimate, free, OpenStreetMap-based tiles
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
-      center: [73.15, 19.0],
-      zoom: 8,
+      style: styleUrls[mapStyle],
+      center: [73.15, 18.9],
+      zoom: 8.5,
     });
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -123,7 +132,7 @@ export default function MapViewEnhanced() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterDistrict, filterTaluka, filterVillage, minArea, maxPrice]);
+  }, [filterDistrict, filterTaluka, filterVillage, minArea, maxPrice, maxRoadDist, mapStyle]);
 
   // Ensure map resizes whenever the container changes size (e.g. sidebar toggle, orientation change, layout shift)
   useEffect(() => {
@@ -159,8 +168,18 @@ export default function MapViewEnhanced() {
           className="px-3 py-1.5 bg-blue-700 text-white rounded text-sm font-medium hover:bg-blue-800 transition-colors whitespace-nowrap"
           onClick={() => setShowFilters(!showFilters)}
         >
-          ⚙ Filters {filterDistrict || filterTaluka || filterVillage || minArea !== '' || maxPrice !== '' ? '●' : ''}
+          ⚙ Filters {filterDistrict || filterTaluka || filterVillage || minArea !== '' || maxPrice !== '' || maxRoadDist !== '' ? '●' : ''}
         </button>
+        <select
+          value={mapStyle}
+          onChange={(e) => setMapStyle(e.target.value as 'liberty' | 'positron' | 'bright')}
+          className="border border-gray-300 rounded px-2 py-1.5 text-xs bg-white text-gray-700"
+          title="Map Style"
+        >
+          <option value="liberty">Liberty (OSM)</option>
+          <option value="positron">Positron (Clean)</option>
+          <option value="bright">Bright (Vibrant)</option>
+        </select>
         <span className="ml-auto text-xs text-gray-500 whitespace-nowrap pl-1">{filteredProperties.length} properties</span>
       </div>
 
@@ -204,6 +223,14 @@ export default function MapViewEnhanced() {
             onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : '')}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-32"
           />
+          <input
+            type="number"
+            placeholder="Max Road Dist (m)"
+            value={maxRoadDist}
+            onChange={(e) => setMaxRoadDist(e.target.value ? Number(e.target.value) : '')}
+            className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-36"
+            title="Max distance to nearest mapped road in metres"
+          />
           <button
             className="col-span-2 sm:col-span-1 px-3 py-1.5 bg-gray-200 rounded text-sm hover:bg-gray-300 font-medium"
             onClick={() => {
@@ -212,6 +239,7 @@ export default function MapViewEnhanced() {
               setFilterVillage('');
               setMinArea('');
               setMaxPrice('');
+              setMaxRoadDist('');
             }}
           >
             Clear

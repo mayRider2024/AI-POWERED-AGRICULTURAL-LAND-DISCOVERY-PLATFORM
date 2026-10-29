@@ -11,15 +11,18 @@ class InterpretedFilters(BaseModel):
     district: Optional[str] = None
     taluka: Optional[str] = None
     village: Optional[str] = None
+    survey_number: Optional[str] = None
     land_type: Optional[str] = None
     min_area_acres: Optional[float] = None
     max_area_acres: Optional[float] = None
-    min_area_strict: Optional[bool] = False  # True for 'above X' (area > X), False for 'at least X' (area >= X)
-    max_area_strict: Optional[bool] = False  # True for 'under X' (area < X), False for 'up to / at most X' (area <= X)
+    min_area_strict: Optional[bool] = False
+    max_area_strict: Optional[bool] = False
     min_price_per_guntha: Optional[float] = None
     max_price_per_guntha: Optional[float] = None
     min_total_price: Optional[float] = None
     max_total_price: Optional[float] = None
+    max_road_distance_meters: Optional[float] = None
+    road_proximity_required: Optional[bool] = False
 
     model_config = ConfigDict(from_attributes=True)
 

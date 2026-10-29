@@ -4,6 +4,7 @@ import type { Property } from '../data/properties';
 import { useNavigate } from 'react-router-dom';
 import { useSaved } from '../context/SavedPropertiesContext';
 import { getApiBaseUrl, setApiBaseUrl } from '../config/api';
+import { startVoiceRecognition } from '../services/speech';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,40 +17,133 @@ function localSearch(query: string): Property[] {
   const q = query.toLowerCase();
 
   let districtFilter = '';
-  if (q.includes('raigad')) districtFilter = 'Raigad';
-  else if (q.includes('palghar')) districtFilter = 'Palghar';
+  if (q.includes('raigad') || q.includes('रायगड')) districtFilter = 'Raigad';
+  else if (q.includes('palghar') || q.includes('पालघर')) districtFilter = 'Palghar';
 
-  // Area parsing
-  let minArea: number | null = null;
-  let minAreaStrict = false;
-  const areaAtLeast = q.match(/(?:at least|minimum of|min)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre)?/);
-  if (areaAtLeast) {
-    minArea = parseFloat(areaAtLeast[1]);
-  } else {
-    const areaAbove = q.match(/(?:above|more than|greater than|>)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre)?/);
-    if (areaAbove) {
-      minArea = parseFloat(areaAbove[1]);
-      minAreaStrict = true;
+  let talukaFilter = '';
+  const talukasMap: Record<string, string> = {
+    panvel: 'Panvel',
+    पनवेल: 'Panvel',
+    alibag: 'Alibag',
+    alibaug: 'Alibag',
+    अलिबाग: 'Alibag',
+    pen: 'Pen',
+    पेण: 'Pen',
+    mhasala: 'Mhasala',
+    म्हसळा: 'Mhasala',
+    talasari: 'Talasari',
+    तलासरी: 'Talasari',
+    vikramgad: 'Vikramgad',
+    विक्रमगड: 'Vikramgad',
+    dahanu: 'Dahanu',
+    डहाणू: 'Dahanu',
+  };
+  for (const [key, name] of Object.entries(talukasMap)) {
+    if (q.includes(key)) {
+      talukaFilter = name;
+      if (['Panvel', 'Alibag', 'Pen', 'Mhasala'].includes(name) && !districtFilter) {
+        districtFilter = 'Raigad';
+      } else if (['Talasari', 'Vikramgad', 'Dahanu'].includes(name) && !districtFilter) {
+        districtFilter = 'Palghar';
+      }
+      break;
     }
   }
 
-  // Price parsing (e.g. ₹30 lakh, 30 lakhs, 1.5 lakh)
-  let maxPrice: number | null = null;
-  const lakhMatch = q.match(/(?:under|below|less than|up to|max)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)/);
-  if (lakhMatch) {
-    maxPrice = parseFloat(lakhMatch[1]) * 100_000;
+  // Survey number parsing
+  let surveyFilter = '';
+  const surveyMatch = q.match(/(?:survey(?:\s*(?:no\.?|number))?|gat(?:\s*(?:no\.?|number))?|सर्व्हे|गट)\s*[:#-]?\s*([a-zA-Z0-9]+(?:\/[0-9]+)?)/i);
+  if (surveyMatch) {
+    surveyFilter = surveyMatch[1].toUpperCase();
+  } else {
+    const codeMatch = q.match(/\b([rp]-[0-9]{3})\b/i);
+    if (codeMatch) surveyFilter = codeMatch[1].toUpperCase();
+  }
+
+  // Area parsing (supports Marathi numbers: ५ एकर)
+  let minArea: number | null = null;
+  let minAreaStrict = false;
+  let maxArea: number | null = null;
+
+  const marathiNums: Record<string, string> = { '०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9' };
+  let qTrans = q;
+  for (const [m, e] of Object.entries(marathiNums)) {
+    qTrans = qTrans.replaceAll(m, e);
+  }
+
+  const areaRange = qTrans.match(/(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
+  if (areaRange) {
+    minArea = parseFloat(areaRange[1]);
+    maxArea = parseFloat(areaRange[2]);
+  } else {
+    const areaAtLeast = qTrans.match(/(?:at least|minimum of|min|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
+    const areaAbove = qTrans.match(/(?:above|more than|greater than|>|पेक्षा जास्त)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
+    const areaUnder = qTrans.match(/(?:under|less than|below|<|पेक्षा कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
+    const areaExact = qTrans.match(/(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
+
+    if (areaAtLeast) {
+      minArea = parseFloat(areaAtLeast[1]);
+      minAreaStrict = false;
+    } else if (areaAbove) {
+      minArea = parseFloat(areaAbove[1]);
+      minAreaStrict = true;
+    } else if (areaUnder) {
+      maxArea = parseFloat(areaUnder[1]);
+    } else if (areaExact) {
+      minArea = parseFloat(areaExact[1]);
+      minAreaStrict = false;
+    }
+  }
+
+  // Price per guntha parsing
+  let minPricePerGuntha: number | null = null;
+  let maxPricePerGuntha: number | null = null;
+  const gunthaRange = qTrans.match(/(?:between\s+)?(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)?\s*(?:to|and|-)\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)\s*(?:per|\/)\s*(?:guntha|गुंठा)/);
+  if (gunthaRange) {
+    const g1 = parseFloat(gunthaRange[1]);
+    const g2 = parseFloat(gunthaRange[2]);
+    minPricePerGuntha = g1 < 1000 ? g1 * 100_000 : g1;
+    maxPricePerGuntha = g2 < 1000 ? g2 * 100_000 : g2;
+  }
+
+  // Total price parsing
+  let maxTotalPrice: number | null = null;
+  if (!maxPricePerGuntha) {
+    const lakhMatch = qTrans.match(/(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)/);
+    if (lakhMatch && !qTrans.includes('per guntha') && !qTrans.includes('गुंठा')) {
+      maxTotalPrice = parseFloat(lakhMatch[1]) * 100_000;
+    }
+    if (maxTotalPrice === null) {
+      const directMatch = qTrans.match(/(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*(\d{5,10})/);
+      if (directMatch) {
+        maxTotalPrice = parseFloat(directMatch[1]);
+      }
+    }
+  }
+
+  // Road distance parsing
+  let maxRoadDistance: number | null = null;
+  const roadMatch = qTrans.match(/(?:within|under|near|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m|meters?|metres?|मीटर)\s*(?:of\s*(?:a\s*)?)?(?:road|highway|रस्ता)/);
+  if (roadMatch) {
+    maxRoadDistance = parseFloat(roadMatch[1]);
   }
 
   return properties.filter((p) => {
     if (districtFilter && p.district !== districtFilter) return false;
+    if (talukaFilter && p.taluka.toLowerCase() !== talukaFilter.toLowerCase()) return false;
+    if (surveyFilter && !p.surveyNumber.toUpperCase().includes(surveyFilter)) return false;
     if (minArea !== null) {
       if (minAreaStrict && p.areaAcres <= minArea) return false;
       if (!minAreaStrict && p.areaAcres < minArea) return false;
     }
-    if (maxPrice !== null && p.totalPrice > maxPrice) return false;
+    if (maxArea !== null && p.areaAcres > maxArea) return false;
+    if (minPricePerGuntha !== null && p.pricePerGuntha < minPricePerGuntha) return false;
+    if (maxPricePerGuntha !== null && p.pricePerGuntha > maxPricePerGuntha) return false;
+    if (maxTotalPrice !== null && p.totalPrice > maxTotalPrice) return false;
+    if (maxRoadDistance !== null && p.roadDistanceMeters && p.roadDistanceMeters > maxRoadDistance) return false;
 
     // Keyword match if no structured filters caught
-    if (!districtFilter && minArea === null && maxPrice === null) {
+    if (!districtFilter && !talukaFilter && !surveyFilter && minArea === null && maxArea === null && maxTotalPrice === null && maxRoadDistance === null) {
       return (
         p.district.toLowerCase().includes(q) ||
         p.taluka.toLowerCase().includes(q) ||
@@ -99,7 +193,35 @@ export default function AIAssistant() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceLang, setVoiceLang] = useState('en-IN');
+  const voiceStopRef = useRef<(() => void) | null>(null);
   const [apiUrl, setApiUrlState] = useState<string>(() => getApiBaseUrl());
+
+  const toggleListening = () => {
+    if (isListening) {
+      voiceStopRef.current?.();
+      setIsListening(false);
+      return;
+    }
+
+    setIsListening(true);
+    const listener = startVoiceRecognition(
+      (transcript) => {
+        setInput(transcript);
+        setIsListening(false);
+      },
+      (err) => {
+        console.warn('Voice error:', err);
+        setIsListening(false);
+      },
+      () => {
+        setIsListening(false);
+      },
+      voiceLang
+    );
+    voiceStopRef.current = listener.stop;
+  };
   const [showConfig, setShowConfig] = useState(false);
   const [configInput, setConfigInput] = useState(apiUrl);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
@@ -335,27 +457,67 @@ export default function AIAssistant() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggestions with updated prompt matching demo listing R-003 */}
+      {/* Suggestions with official prompts */}
       <div className="px-3 sm:px-4 py-2 bg-gray-50 border-t border-gray-200 flex gap-2 overflow-x-auto flex-shrink-0 no-scrollbar">
-        {['Farms under ₹30 lakh in Raigad', 'Farms in Raigad', 'Land in Dahanu', 'Palghar farms'].map((s) => (
+        {[
+          'Farms under ₹30 lakh in Raigad',
+          'Find survey number 125/2 in Panvel',
+          'मला पालघरमध्ये ५ एकर शेतीची जमीन दाखवा',
+          'Find 10 acres in Palghar between ₹10 lakh and ₹15 lakh per guntha, within 100 metres of a road',
+        ].map((s) => (
           <button
             key={s}
             onClick={() => { setInput(s); }}
-            className="whitespace-nowrap text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-full hover:bg-green-50 hover:border-green-300 transition-colors shadow-2xs"
+            className="whitespace-nowrap text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-full hover:bg-green-50 hover:border-green-300 transition-colors shadow-2xs font-medium text-gray-700"
           >
             {s}
           </button>
         ))}
       </div>
 
+      {/* Voice status feedback */}
+      {isListening && (
+        <div className="px-4 py-1.5 bg-red-50 border-t border-red-200 flex items-center justify-between text-xs text-red-700 font-medium animate-pulse">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
+            Listening in {voiceLang === 'en-IN' ? 'English' : voiceLang === 'hi-IN' ? 'Hindi' : 'Marathi'}… Speak now
+          </span>
+          <button onClick={toggleListening} className="underline text-red-800 text-xs">Stop</button>
+        </div>
+      )}
+
       {/* Input */}
-      <div className="p-3 bg-white border-t border-gray-200 flex gap-2 flex-shrink-0 z-10">
+      <div className="p-3 bg-white border-t border-gray-200 flex items-center gap-2 flex-shrink-0 z-10">
+        <select
+          value={voiceLang}
+          onChange={(e) => setVoiceLang(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-xs bg-gray-50 text-gray-700 outline-none"
+          title="Voice Language"
+        >
+          <option value="en-IN">EN</option>
+          <option value="mr-IN">मराठी</option>
+          <option value="hi-IN">हिंदी</option>
+        </select>
+
+        <button
+          type="button"
+          onClick={toggleListening}
+          className={`p-2 rounded-lg border text-sm transition-colors flex items-center justify-center ${
+            isListening
+              ? 'bg-red-600 text-white border-red-700 animate-bounce'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300'
+          }`}
+          title="Voice search"
+        >
+          🎤
+        </button>
+
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
-          placeholder="Ask about land in Raigad or Palghar…"
+          placeholder="Ask in English or मराठी (e.g. 5 acres in Panvel)…"
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 bg-white"
           disabled={loading}
         />

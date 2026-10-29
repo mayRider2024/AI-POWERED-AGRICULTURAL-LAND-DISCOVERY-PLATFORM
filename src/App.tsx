@@ -9,6 +9,11 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import { SavedProvider } from './context/SavedPropertiesContext';
 
+import LandRecords from './pages/LandRecords';
+import IntelligenceReport from './pages/IntelligenceReport';
+import PropertyComparison from './pages/PropertyComparison';
+import BrokerDashboard from './pages/BrokerDashboard';
+
 function App() {
   return (
     <SavedProvider>
@@ -20,6 +25,10 @@ function App() {
             <Route path="/property/:id" element={<PropertyDetails />} />
             <Route path="/saved" element={<SavedProperties />} />
             <Route path="/assistant" element={<AIAssistant />} />
+            <Route path="/records" element={<LandRecords />} />
+            <Route path="/intelligence" element={<IntelligenceReport />} />
+            <Route path="/compare" element={<PropertyComparison />} />
+            <Route path="/broker" element={<BrokerDashboard />} />
             <Route path="/activity" element={<Activity />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminDashboard />} />
