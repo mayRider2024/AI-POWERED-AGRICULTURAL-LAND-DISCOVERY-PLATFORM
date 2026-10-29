@@ -10,4 +10,3 @@ python-dotenv
 pytest
 httpx
 google-genai>=0.2.0
-uvicorn[standard]

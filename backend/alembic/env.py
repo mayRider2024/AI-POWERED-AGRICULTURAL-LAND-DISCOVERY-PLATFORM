@@ -21,8 +21,22 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.db.base import Base  # noqa: E402
+from app.core.config import Settings  # noqa: E402
 
 target_metadata = Base.metadata
+
+def get_database_url() -> str:
+    """Retrieve database URL from application settings/env, falling back to alembic.ini."""
+    try:
+        app_settings = Settings()
+        if app_settings.DATABASE_URL:
+            return app_settings.DATABASE_URL
+    except Exception:
+        pass
+    env_url = os.environ.get("DATABASE_URL")
+    if env_url:
+        return env_url
+    return config.get_main_option("sqlalchemy.url")
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -33,7 +47,7 @@ def run_migrations_offline():
     Calls to context.execute() here emit the given string to the
     script output.
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = get_database_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -49,8 +63,11 @@ def run_migrations_online():
     In this scenario we need to create an Engine
     and associate a connection with the context.
     """
+    configuration = config.get_section(config.config_ini_section) or {}
+    configuration["sqlalchemy.url"] = get_database_url()
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
