@@ -217,20 +217,59 @@ def _apply_filters(db: Session, filters: InterpretedFilters) -> List[PropertyLis
         query = query.filter(PropertyListing.total_price >= filters.min_total_price)
     if filters.max_total_price is not None:
         query = query.filter(PropertyListing.total_price <= filters.max_total_price)
+    if filters.max_road_distance_meters is not None:
+        query = query.filter(PropertyListing.road_distance_meters <= filters.max_road_distance_meters)
     return query.all()
+
+def _diagnose_unmet_constraints(db: Session, filters: InterpretedFilters) -> List[str]:
+    """When a multi-constraint search yields 0 results, identify which constraints caused the miss."""
+    unmet = []
+    # Check district
+    if filters.district:
+        dist_count = db.query(PropertyListing).join(District).filter(District.name.ilike(filters.district)).count()
+        if dist_count == 0:
+            unmet.append(f"No properties found in district '{filters.district}'.")
+    # Check road proximity
+    if filters.max_road_distance_meters is not None:
+        road_count = db.query(PropertyListing).filter(PropertyListing.road_distance_meters <= filters.max_road_distance_meters).count()
+        if road_count == 0:
+            unmet.append(f"No properties within {filters.max_road_distance_meters:g}m of a mapped road.")
+    # Check price per guntha
+    if filters.min_price_per_guntha or filters.max_price_per_guntha:
+        q = db.query(PropertyListing)
+        if filters.min_price_per_guntha:
+            q = q.filter(PropertyListing.price_per_guntha >= filters.min_price_per_guntha)
+        if filters.max_price_per_guntha:
+            q = q.filter(PropertyListing.price_per_guntha <= filters.max_price_per_guntha)
+        if q.count() == 0:
+            unmet.append("No properties found within the specified price per guntha range.")
+    # Check area
+    if filters.min_area_acres:
+        area_count = db.query(PropertyListing).filter(PropertyListing.area_acres >= filters.min_area_acres).count()
+        if area_count == 0:
+            unmet.append(f"No properties found with at least {filters.min_area_acres:g} acres.")
+    # If individual constraints have hits but combined is empty
+    if not unmet:
+        unmet.append("No single property satisfies all combined criteria simultaneously (district, acreage, road distance, and price).")
+    return unmet
 
 def perform_ai_search(request: AISearchRequest, db: Session) -> AISearchResponse:
     # Interpret natural language query
     filters = _interpret_query(request.query)
     # Query DB with filters
     properties = _apply_filters(db, filters)
-    # Serialize results safely, handling geometry and total_price calculation
+
+    unmet_constraints = []
+    explanation = "Filters interpreted by Gemini AI."
+    if not properties:
+        unmet_constraints = _diagnose_unmet_constraints(db, filters)
+        explanation = f"No matching properties found. " + " ".join(unmet_constraints)
+
+    # Serialize results safely, handling geometry, multi-unit area, and provenance
     serialized = []
     for p in properties:
-        # Extract coordinates from property directly (location is stored as 'lat,lng' string)
         lat = p.latitude
         lng = p.longitude
-        # Compute total_price if not stored
         total_price = getattr(p, "total_price", None)
         if total_price is None:
             total_price = (p.area_acres or 0) * 40 * (p.price_per_guntha or 0)
@@ -242,20 +281,31 @@ def perform_ai_search(request: AISearchRequest, db: Session) -> AISearchResponse
             "latitude": lat,
             "longitude": lng,
             "area_acres": float(p.area_acres),
+            "area_gunthas": float(p.area_gunthas) if p.area_gunthas is not None else float(p.area_acres * 40),
+            "area_hectares": float(p.area_hectares) if p.area_hectares is not None else round(float(p.area_acres) * 0.404686, 4),
             "price_per_guntha": float(p.price_per_guntha),
+            "total_price": float(total_price),
             "land_type": p.land_type,
+            "road_distance_meters": float(p.road_distance_meters) if p.road_distance_meters is not None else None,
+            "road_type": p.road_type,
+            "geometry_type": getattr(p, "geometry_type", "point"),
+            "provenance_type": getattr(p, "provenance_type", "demo"),
+            "source_url": p.source_url,
+            "verified_at": p.verified_at.isoformat() if p.verified_at else None,
             "verification_status": p.verification_status,
             "source_type": p.source_type,
-            "total_price": float(total_price),
             "district": getattr(p.district, "name", None),
             "taluka": getattr(p.taluka, "name", None),
             "village": getattr(p.village, "name", None),
         })
+
     return AISearchResponse(
         original_query=request.query,
         interpreted_filters=filters,
         matching_count=len(serialized),
         properties=serialized,
-        explanation="Filters interpreted by Gemini AI.",
+        explanation=explanation,
+        unmet_constraints=unmet_constraints,
         unsupported=[],
+        demo_notice="Demo data – unverified. Fictional parcels are never represented as official government records.",
     )

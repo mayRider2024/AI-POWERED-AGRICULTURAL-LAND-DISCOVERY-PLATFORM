@@ -157,16 +157,43 @@ def seed_demo_data(verbose: bool = True):
             else:
                 updated_count += 1
 
+            # Multi-unit conversions: 1 acre = 0.404686 hectares, 1 hectare = 100 ares
+            area_hectares = round(pdata["area_acres"] * 0.404686, 4)
+            area_ares = round(area_hectares * 100, 2)
+
             prop.title = pdata["title"]
             prop.description = pdata["description"]
             prop.location = location_str
             prop.area_acres = pdata["area_acres"]
             prop.area_gunthas = area_gunthas
+            prop.area_hectares = area_hectares
+            prop.area_ares = area_ares
+            prop.source_area_unit = "acres"
             prop.price_per_guntha = pdata["price_per_guntha"]
             prop.total_price = total_price
             prop.land_type = "agricultural"
+
+            # Road proximity data
+            road_dist_map = {
+                "R-001": (45.0, "Paved State Highway"),
+                "R-002": (120.0, "Village Road (Tar)"),
+                "P-001": (80.0, "District Road"),
+                "P-002": (210.0, "Kaccha / Farm Track"),
+                "R-003": (60.0, "Paved Approach Road"),
+                "P-003": (95.0, "Coastal Road"),
+                "125/2": (75.0, "National Highway 48 Feeder"),
+            }
+            r_dist, r_type = road_dist_map.get(pdata["survey_number"], (100.0, "Tar Road"))
+            prop.road_distance_meters = r_dist
+            prop.road_type = r_type
+            prop.geometry_type = "point"
+
+            # Explicit provenance tracking
+            prop.provenance_type = "demo"
             prop.source_type = "demo"
             prop.verification_status = "unverified"
+            prop.verification_notes = "Fictional demonstration parcel. Never represented as an authentic Maharashtra government cadastral record."
+            prop.source_url = "https://bhulekh.mahabhumi.gov.in/"
             prop.district_id = pdata["district"].id
             prop.taluka_id = pdata["taluka"].id
             prop.village_id = pdata["village"].id

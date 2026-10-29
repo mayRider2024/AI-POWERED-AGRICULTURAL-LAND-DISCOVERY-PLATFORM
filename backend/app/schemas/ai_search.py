@@ -32,7 +32,8 @@ class AISearchResponse(BaseModel):
     matching_count: int
     properties: List[Dict[str, Any]]
     explanation: str
+    unmet_constraints: List[str] = []
     unsupported: List[str] = []
-    demo_notice: str = "Demo data – unverified"
+    demo_notice: str = "Demo data – unverified. Fictional parcels are never represented as official government records."
 
     model_config = ConfigDict(from_attributes=True)

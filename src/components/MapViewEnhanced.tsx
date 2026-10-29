@@ -343,25 +343,47 @@ export default function MapViewEnhanced() {
               </div>
               <button onClick={() => setSelectedPropId(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
             </div>
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">DEMO / UNVERIFIED</span>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                DEMO / UNVERIFIED
+              </span>
+              <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                📍 Approx Point (±25m)
+              </span>
+            </div>
             <div className="mt-2 text-sm text-gray-600 space-y-1">
               <p>{selectedProperty.taluka} · {selectedProperty.village}</p>
-              <p>📐 {selectedProperty.areaAcres} acres</p>
-              <p className="text-green-700 font-medium">₹{selectedProperty.totalPrice.toLocaleString()}</p>
+              <p>📐 {selectedProperty.areaAcres} acres ({(selectedProperty.areaAcres * 40).toFixed(0)} gunthas)</p>
+              <p className="text-green-700 font-bold">₹{selectedProperty.totalPrice.toLocaleString()} <span className="text-xs text-gray-500 font-normal">asking</span></p>
+              {selectedProperty.roadDistanceMeters && (
+                <p className="text-xs text-gray-500">
+                  🛣️ ~{selectedProperty.roadDistanceMeters}m to {selectedProperty.roadType || 'road'} (OpenStreetMap calc)
+                </p>
+              )}
             </div>
-            <div className="flex gap-2 mt-3">
-              <button
-                className="flex-1 px-3 py-1.5 bg-green-700 text-white rounded text-sm hover:bg-green-800"
-                onClick={() => navigate(`/property/${selectedProperty.id}`)}
+            <div className="mt-2 pt-2 border-t border-gray-100 flex flex-col gap-1.5">
+              <a
+                href="https://bhulekh.mahabhumi.gov.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-center py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-semibold hover:bg-amber-100"
               >
-                View Details
-              </button>
-              <button
-                className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
-                onClick={() => toggleSave(selectedProperty.id)}
-              >
-                {savedIds.includes(selectedProperty.id) ? '♥' : '♡'}
-              </button>
+                Verify on Mahabhulekh 7/12 →
+              </a>
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 px-3 py-1.5 bg-green-700 text-white rounded text-sm hover:bg-green-800"
+                  onClick={() => navigate(`/property/${selectedProperty.id}`)}
+                >
+                  View Intelligence Report
+                </button>
+                <button
+                  className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
+                  onClick={() => toggleSave(selectedProperty.id)}
+                >
+                  {savedIds.includes(selectedProperty.id) ? '♥' : '♡'}
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -27,10 +27,12 @@ class PropertyListing(Base):
     # Geographic point for the property
     location = Column(String, nullable=False)
 
-    # Area stored in acres (Decimal)
+    # Multi-unit area fields
     area_acres = Column(Numeric(12, 2), nullable=False)
-    # Derived guntha area (computed, stored for convenience)
     area_gunthas = Column(Numeric(12, 2), nullable=False)
+    area_hectares = Column(Numeric(12, 4), nullable=True)
+    area_ares = Column(Numeric(12, 2), nullable=True)
+    source_area_unit = Column(String, nullable=False, default="acres")
 
     # Price per guntha and total price (Decimal)
     price_per_guntha = Column(Numeric(15, 2), nullable=False)
@@ -38,13 +40,23 @@ class PropertyListing(Base):
 
     land_type = Column(String, nullable=True)  # e.g., "agricultural", "forest"
 
+    # Road proximity and parcel geometry
+    road_distance_meters = Column(Numeric(10, 2), nullable=True)
+    road_type = Column(String, nullable=True)
+    geometry_type = Column(String, nullable=False, default="point")
+    geometry_geojson = Column(Text, nullable=True)
+
     # Administrative foreign keys – must reference existing rows
     district_id = Column(Integer, ForeignKey("districts.id"), nullable=False)
     taluka_id = Column(Integer, ForeignKey("talukas.id"), nullable=False)
     village_id = Column(Integer, ForeignKey("villages.id"), nullable=False)
     data_source_id = Column(Integer, ForeignKey("data_sources.id"), nullable=False)
 
-    # Source / verification fields for demo data
+    # Provenance and verification tracking
+    provenance_type = Column(String, nullable=False, default="demo")  # demo, seller_submitted, broker_submitted, user_712_imported, government_verified
+    source_url = Column(String, nullable=True)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
+    verification_notes = Column(Text, nullable=True)
     source_type = Column(String, nullable=False, default="demo")
     verification_status = Column(String, nullable=False, default="unverified")
 
