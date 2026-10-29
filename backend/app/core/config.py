@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str | None = None
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
+    # Rate limiting configuration (per client IP)
+    RATE_LIMIT_AI_PER_MINUTE: int = 5
+    RATE_LIMIT_AI_ENABLED: bool = True
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
