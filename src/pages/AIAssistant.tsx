@@ -10,6 +10,9 @@ interface Message {
   role: 'user' | 'assistant';
   text: string;
   source?: 'gemini' | 'local';
+  explanation?: string;
+  unmetConstraints?: string[];
+  unsupported?: string[];
   results?: Property[];
 }
 
@@ -187,8 +190,9 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      text: 'Hello! I can help you search for agricultural land in Raigad and Palghar. Try asking: "Farms under ₹30 lakh in Raigad" or "Find land in Alibag".',
+      text: 'Hello! I can help you search for agricultural land in Raigad and Palghar using natural language or voice in English, Marathi, or Hindi.',
       source: 'local',
+      explanation: 'Try queries like: "Show agricultural land under ₹40 lakh in Raigad", "Find survey number 125/2 in Panvel", or "मला पालघरमध्ये ५ एकर शेतीची जमीन दाखवा."',
     },
   ]);
   const [input, setInput] = useState('');
@@ -273,6 +277,9 @@ export default function AIAssistant() {
     try {
       let results: Property[] = [];
       let responseText = '';
+      let explanation = '';
+      let unmetConstraints: string[] = [];
+      let unsupported: string[] = [];
       let source: 'gemini' | 'local' = 'local';
 
       if (backendStatus === 'online') {
@@ -281,13 +288,16 @@ export default function AIAssistant() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query }),
-          signal: AbortSignal.timeout(8000),
+          signal: AbortSignal.timeout(10000),
         });
         if (resp.ok) {
           const data = await resp.json();
           const rawProps = data.properties ?? data.results ?? [];
           results = rawProps.map(normalizeProperty);
-          responseText = data.message ?? `Found ${results.length} matching properties.`;
+          responseText = `Found ${results.length} matching ${results.length === 1 ? 'property' : 'properties'}.`;
+          explanation = data.explanation || '';
+          unmetConstraints = data.unmet_constraints || data.relaxation_hints || [];
+          unsupported = data.unsupported || [];
           source = 'gemini';
         } else {
           throw new Error(`Backend returned ${resp.status}`);
@@ -298,11 +308,22 @@ export default function AIAssistant() {
         responseText =
           results.length > 0
             ? `Found ${results.length} demo properties matching "${query}".`
-            : `No demo properties matched "${query}". Try "Farms under ₹30 lakh in Raigad" or "Alibag".`;
+            : `Found 0 matching properties.`;
+        explanation = results.length > 0
+          ? 'Matched from local demonstration dataset.'
+          : 'No demo properties matched all terms. Try relaxing constraints (e.g. "Farms under ₹40 lakh in Raigad").';
         source = 'local';
       }
 
-      const assistantMsg: Message = { role: 'assistant', text: responseText, source, results };
+      const assistantMsg: Message = {
+        role: 'assistant',
+        text: responseText,
+        source,
+        explanation,
+        unmetConstraints,
+        unsupported,
+        results,
+      };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch {
       // Fallback to local demo search on network failure
@@ -313,6 +334,7 @@ export default function AIAssistant() {
           role: 'assistant',
           text: `Backend connection error. Showing local demo results for "${query}".`,
           source: 'local',
+          explanation: 'Could not connect to live API server. Reverted to offline demo catalog.',
           results: localResults,
         },
       ]);
@@ -397,21 +419,46 @@ export default function AIAssistant() {
                 ? 'bg-green-700 text-white rounded-br-sm'
                 : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
             }`}>
-              {msg.role === 'assistant' && msg.source && (
-                <div className="mb-1 flex items-center gap-1.5">
-                  {msg.source === 'gemini' ? (
-                    <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                      ✨ Gemini AI Powered
+              {msg.role === 'assistant' && (
+                <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                  {msg.source === 'gemini' || (i === 0 && backendStatus === 'online') ? (
+                    <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                      ✨ AI-Powered Land Search
                     </span>
                   ) : (
-                    <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                    <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                       ⚡ Local Demo Search
                     </span>
+                  )}
+                  {backendStatus === 'online' && (
+                    <span className="text-[9px] text-gray-400">Live Backend</span>
                   )}
                 </div>
               )}
 
-              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              <p className="text-sm font-medium whitespace-pre-wrap">{msg.text}</p>
+
+              {msg.explanation && (
+                <div className="mt-1.5 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg p-2.5 space-y-1">
+                  <p className="leading-relaxed">{msg.explanation}</p>
+                  {msg.unmetConstraints && msg.unmetConstraints.length > 0 && (
+                    <div className="mt-1.5 pt-1.5 border-t border-gray-200/60">
+                      <p className="text-[11px] font-semibold text-gray-500">Unmet Criteria / Relaxation Hints:</p>
+                      <ul className="list-disc list-inside space-y-0.5 mt-0.5 text-gray-600 text-[11px]">
+                        {msg.unmetConstraints.map((hint, idx) => (
+                          <li key={idx}>{hint}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {msg.unsupported && msg.unsupported.length > 0 && (
+                    <div className="mt-1 text-[11px] text-amber-700">
+                      ⚠️ Note: {msg.unsupported.join(', ')}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {msg.results && msg.results.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {msg.results.map((p) => (
