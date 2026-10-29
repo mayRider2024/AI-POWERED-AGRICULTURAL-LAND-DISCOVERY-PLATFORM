@@ -1,5 +1,3 @@
-import { Capacitor } from '@capacitor/core';
-
 export const BACKEND_URL_KEY = 'll_backend_url';
 
 /**
@@ -27,12 +25,8 @@ export function getApiBaseUrl(): string {
     return envUrl.trim().replace(/\/+$/, '');
   }
 
-  // Fallback
-  if (Capacitor.getPlatform() === 'android') {
-    return 'http://10.0.2.2:8001';
-  }
-
-  return 'http://127.0.0.1:8001';
+  // Fallback: Default to live production HTTPS backend on Render
+  return 'https://landlens-ai-api.onrender.com';
 }
 
 export function setApiBaseUrl(url: string): void {
