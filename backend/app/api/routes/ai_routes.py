@@ -17,5 +17,7 @@ def get_db():
 def ai_search(request: AISearchRequest, db: Session = Depends(get_db)):
     try:
         return perform_ai_search(request, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Search processing encountered an internal error. Please try again.")

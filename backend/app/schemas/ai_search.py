@@ -1,9 +1,9 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Dict, Any
 
 class AISearchRequest(BaseModel):
     """User‑provided natural language query."""
-    query: str
+    query: str = Field(..., min_length=1, max_length=500, description="Natural language land search query")
 
     model_config = ConfigDict(from_attributes=True)
 
