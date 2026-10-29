@@ -25,6 +25,12 @@ import re
 def _rule_based_interpret_query(query: str) -> InterpretedFilters:
     q = query.lower()
 
+    # Marathi digits transliteration at the very start so all regexes see standard Arabic numerals
+    marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
+    for m_digit, eng_digit in marathi_nums.items():
+        q = q.replace(m_digit, eng_digit)
+    q_trans = q
+
     # District detection (including Marathi/Hindi transliterations: रायगड, पालघर)
     district = None
     if "raigad" in q or "रायगड" in q:
@@ -72,28 +78,51 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         if code_match:
             survey_number = code_match.group(1).upper()
 
+    # Road proximity parsing (English & Marathi: "within 100 metres of a road", "no more than 100 meters from a road", "रस्त्यापासून २०० मीटर")
+    max_road_distance = None
+    road_req = False
+    road_match = re.search(
+        r'(?:no\s+more\s+than|within|under|less\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)\s*(?:from|of|अंतरावर|अंतरापर्यंत)?\s*(?:a\s*)?(?:road|highway|रस्ता|रस्त्या)',
+        q
+    )
+    if not road_match:
+        # Check Marathi prefix form: "रस्त्यापासून २०० मीटर", "रस्त्यालगत ५० मीटर"
+        road_match = re.search(
+            r'(?:रस्त्यापासून|रस्त्यालगत|रस्त्यावरून|रस्ता)\s*(?:कमीत\s*कमी|जास्तीत\s*जास्त|सुमारे|आत|पर्यंत)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)',
+            q
+        )
+
+    if road_match:
+        max_road_distance = float(road_match.group(1))
+        road_req = True
+    elif "road" in q or "highway" in q or "रस्ता" in q or "रस्त्या" in q:
+        road_req = True
+
     # Area parsing (acres / एकर / gunthas / गुंठा)
     min_area = None
     min_area_strict = False
     max_area = None
     max_area_strict = False
 
-    # Check for area range (e.g. "5 to 10 acres", "between 5 and 10 acres", "10 acres", "५ एकर")
-    area_range = re.search(r'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)', q)
+    # Marathi digits transliteration
+    marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
+    q_trans = q
+    for m_digit, eng_digit in marathi_nums.items():
+        q_trans = q_trans.replace(m_digit, eng_digit)
+
+    area_unit = r'(?:acres?|acre|एकर)'
+
+    # Check for area range (e.g. "5 to 10 acres", "between 5 and 10 acres", "५ ते १० एकर")
+    area_range = re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
     if area_range:
         min_area = float(area_range.group(1))
         max_area = float(area_range.group(2))
     else:
-        # Check for Marathi number e.g. "५ एकर"
-        marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
-        q_trans = q
-        for m_digit, eng_digit in marathi_nums.items():
-            q_trans = q_trans.replace(m_digit, eng_digit)
-
-        area_at_least = re.search(r'(?:at least|minimum of|min|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?', q_trans)
-        area_above = re.search(r'(?:above|more than|greater than|>|पेक्षा जास्त)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?', q_trans)
-        area_under = re.search(r'(?:under|less than|below|<|पेक्षा कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?', q_trans)
-        area_exact = re.search(r'(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)', q_trans)
+        # Unit MUST be explicitly present - never make unit optional to prevent capturing road distance or prices!
+        area_at_least = re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_above = re.search(rf'(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_under = re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_exact = re.search(rf'\b(\d+(?:\.\d+)?)\s*{area_unit}\b', q_trans)
 
         if area_at_least:
             min_area = float(area_at_least.group(1))
@@ -105,42 +134,49 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
             max_area = float(area_under.group(1))
             max_area_strict = True
         elif area_exact:
-            # "10 acres of land"
+            # "10 acres of land", "10 acre agricultural land"
             min_area = float(area_exact.group(1))
             min_area_strict = False
 
-    # Price per guntha parsing (e.g. "between ₹10 lakh and ₹15 lakh per guntha", "₹50000 per guntha")
+    # Price per guntha parsing (e.g. "between ₹10 lakh and ₹15 lakh per guntha", "Rs 10 lac per gunta to Rs 15 lac a gunta", "₹50000 per guntha")
     min_price_per_guntha = None
     max_price_per_guntha = None
-    guntha_range = re.search(r'(?:between\s+)?(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)?\s*(?:to|and|-)\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)\s*(?:per|/)\s*(?:guntha|गुंठा)', q)
+    guntha_unit = r'(?:gunthas?|guntha|guntas?|gunta|गुंठा|गुंठे)'
+    lac_unit = r'(?:lakhs?|lakh|lacs?|lac|लाख)'
+    curr_prefix = r'(?:₹|rs\.?|inr)?'
+
+    guntha_range = re.search(
+        rf'(?:price\s+range\s+)?(?:between\s+)?{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}?\s*(?:per|/|a)?\s*{guntha_unit}?\s*(?:to|and|-|ते)\s*{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}\s*(?:per|/|a)\s*{guntha_unit}',
+        q_trans
+    )
     if guntha_range:
         g1 = float(guntha_range.group(1))
         g2 = float(guntha_range.group(2))
         min_price_per_guntha = g1 * 100_000 if g1 < 1000 else g1
         max_price_per_guntha = g2 * 100_000 if g2 < 1000 else g2
+    else:
+        single_guntha_price = re.search(
+            rf'{curr_prefix}\s*(\d+(?:\.\d+)?)\s*({lac_unit})?\s*(?:per|/|a)\s*{guntha_unit}',
+            q_trans
+        )
+        if single_guntha_price:
+            amt = float(single_guntha_price.group(1))
+            if single_guntha_price.group(2) or amt < 1000:
+                amt = amt * 100_000
+            max_price_per_guntha = amt
 
     # Total Price parsing (e.g. "under ₹40 lakh", "under ₹30 lakh in Raigad")
     max_total_price = None
     min_total_price = None
     if not max_price_per_guntha:
-        lakh_under = re.search(r'(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)', q)
-        if lakh_under and not ("per guntha" in q or "गुंठा" in q):
+        lakh_under = re.search(r'(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)', q_trans)
+        if lakh_under and not ("per guntha" in q_trans or "per gunta" in q_trans or "a gunta" in q_trans or "a guntha" in q_trans or "गुंठा" in q_trans):
             max_total_price = float(lakh_under.group(1)) * 100_000
 
         if max_total_price is None:
-            direct_price_under = re.search(r'(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*(\d{5,10})', q)
+            direct_price_under = re.search(r'(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*(\d{5,10})', q_trans)
             if direct_price_under:
                 max_total_price = float(direct_price_under.group(1))
-
-    # Road proximity parsing (e.g. "within 100 metres of a road", "roadside", "near road")
-    max_road_distance = None
-    road_req = False
-    road_match = re.search(r'(?:within|under|near|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m|meters?|metres?|मीटर)\s*(?:of\s*(?:a\s*)?)?(?:road|highway|रस्ता)', q)
-    if road_match:
-        max_road_distance = float(road_match.group(1))
-        road_req = True
-    elif "road" in q or "highway" in q or "रस्ता" in q:
-        road_req = True
 
     return InterpretedFilters(
         district=district,
@@ -166,10 +202,14 @@ def _interpret_query(query: str) -> InterpretedFilters:
             client = _get_gemini_client()
             prompt = (
                 "Extract structured search filters from this Indian agricultural land query in English, Hindi, or Marathi. "
+                "CRITICAL INSTRUCTIONS ON UNITS AND CONSTRAINTS: "
+                "- Never confuse road distance with land acreage. '100 meters from a road' -> max_road_distance_meters = 100. "
+                "- '10 acre land' -> min_area_acres = 10. Do not assign distance in meters to acreage. "
+                "- 'Rs 10 lac per gunta to Rs 15 lac a gunta' -> min_price_per_guntha = 1000000, max_price_per_guntha = 1500000. "
                 "District options: 'Raigad' or 'Palghar'. "
-                "Note: Panvel is a taluka in Raigad. 1 lakh = 100,000 INR and 1 crore = 10,000,000 INR. "
-                "Extract survey_number if mentioned (e.g., '125/2', 'R-001'). "
-                "Extract max_road_distance_meters if road proximity is specified (e.g., 'within 100 metres of a road'). "
+                "Note: Panvel is a taluka in Raigad. 1 lakh/lac = 100,000 INR and 1 crore = 10,000,000 INR. 1 acre = 40 gunthas. "
+                "Extract survey_number if mentioned (e.g., '125/2', 'R-001', 'P-001'). "
+                "Extract max_road_distance_meters if road proximity is specified (e.g., 'within 100 metres of a road', 'no more than 100 meters from a road'). "
                 f"Query: {query}"
             )
             response = client.models.generate_content(
