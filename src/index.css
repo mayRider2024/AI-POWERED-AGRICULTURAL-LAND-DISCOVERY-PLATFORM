@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────
+   Base resets
+────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent text-align:center from leaking into the app */
+#root {
+  text-align: left;
+}
+
+/* ──────────────────────────────────────────
+   Utility: remove default link underline
+   (Tailwind generates no-underline only when
+    the class is used; ensure NavLinks are clean)
+────────────────────────────────────────── */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ──────────────────────────────────────────
+   MapLibre container must fill its parent
+────────────────────────────────────────── */
+.maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ──────────────────────────────────────────
+   Safe-area utilities for mobile/Capacitor
+────────────────────────────────────────── */
+.safe-area-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.safe-area-top {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+/* Ensure smooth touch scrolling on mobile */
+.overflow-y-auto,
+.overflow-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent horizontal page overflow */
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+}
