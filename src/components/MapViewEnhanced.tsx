@@ -348,7 +348,7 @@ export default function MapViewEnhanced() {
                 DEMO / UNVERIFIED
               </span>
               <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                📍 Approx Point (±25m)
+                📍 Demo location — not a verified parcel boundary
               </span>
             </div>
             <div className="mt-2 text-sm text-gray-600 space-y-1">
@@ -357,7 +357,7 @@ export default function MapViewEnhanced() {
               <p className="text-green-700 font-bold">₹{selectedProperty.totalPrice.toLocaleString()} <span className="text-xs text-gray-500 font-normal">asking</span></p>
               {selectedProperty.roadDistanceMeters && (
                 <p className="text-xs text-gray-500">
-                  🛣️ ~{selectedProperty.roadDistanceMeters}m to {selectedProperty.roadType || 'road'} (OpenStreetMap calc)
+                  🛣️ ~{selectedProperty.roadDistanceMeters}m to {selectedProperty.roadType || 'road'} (Estimated from demo point, not verified access)
                 </p>
               )}
             </div>
@@ -368,7 +368,7 @@ export default function MapViewEnhanced() {
                 rel="noopener noreferrer"
                 className="w-full text-center py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-semibold hover:bg-amber-100"
               >
-                Verify on Mahabhulekh 7/12 →
+                Search Official Mahabhulekh 7/12 Portal →
               </a>
               <div className="flex gap-2">
                 <button

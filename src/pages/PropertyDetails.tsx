@@ -61,8 +61,17 @@ export default function PropertyDetails() {
       <div className="border-b border-gray-100 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <span className="text-xs text-gray-400 font-semibold uppercase">Agricultural Land Parcel</span>
-            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{property.surveyNumber}</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 font-semibold uppercase">
+                {property.isDemo ? 'Demo Listing' : 'Agricultural Land Parcel'}
+              </span>
+              <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                {property.isDemo ? 'FICTIONAL DEMO ID' : 'GOVT SURVEY'}
+              </span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
+              {property.isDemo ? `Demo Reference: ${property.surveyNumber}` : `Survey No. ${property.surveyNumber}`}
+            </h1>
             <p className="text-sm text-gray-500">{property.village}, Taluka {property.taluka}, District {property.district}, Maharashtra</p>
           </div>
           <div className="text-right">
@@ -78,19 +87,23 @@ export default function PropertyDetails() {
         <div className="sm:col-span-2 h-56 bg-gradient-to-br from-green-800 to-emerald-900 rounded-lg flex flex-col items-center justify-center text-white p-4 text-center">
           <span className="text-4xl mb-2">🌾</span>
           <span className="font-bold text-base">Agricultural Land Plot {property.surveyNumber}</span>
-          <span className="text-xs text-green-200 mt-1">{property.areaAcres} Acres ({gunthas} Gunthas) · Fertile Soil</span>
-          <span className="text-[10px] bg-black/30 px-2 py-0.5 rounded mt-3">Coordinates: {property.coordinates[1]}°N, {property.coordinates[0]}°E</span>
+          <span className="text-xs text-green-200 mt-1">{property.areaAcres} Acres ({gunthas} Gunthas) · Demo Land Concept</span>
+          <span className="text-[10px] bg-black/30 px-2 py-0.5 rounded mt-3">Demo Coordinates: {property.coordinates[1]}°N, {property.coordinates[0]}°E (Not a verified boundary)</span>
         </div>
         <div className="space-y-2">
           <div className="h-26 bg-gradient-to-br from-lime-800 to-green-900 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
             <span className="text-2xl">🛣️</span>
             <span className="text-xs font-semibold mt-1">Road Proximity</span>
-            <span className="text-[10px] text-green-200">{property.roadDistanceMeters ?? 60}m to {property.roadType ?? 'Village Road'}</span>
+            <span className="text-[10px] text-green-200">
+              {property.roadDistanceMeters ? `~${property.roadDistanceMeters}m to ${property.roadType ?? 'Road'} (Demo estimate)` : 'Road distance unverified'}
+            </span>
           </div>
           <div className="h-26 bg-gradient-to-br from-teal-800 to-emerald-950 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
             <span className="text-2xl">📜</span>
             <span className="text-xs font-semibold mt-1">7/12 Land Record</span>
-            <span className="text-[10px] text-teal-200">Gat No. Registered</span>
+            <span className="text-[10px] text-teal-200">
+              {property.isDemo ? 'Unverified — Demo Record Only' : 'Official Gat No. Pending Verification'}
+            </span>
           </div>
         </div>
       </div>
@@ -109,13 +122,17 @@ export default function PropertyDetails() {
         </div>
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
           <span className="text-xs text-gray-400 block">Road Distance</span>
-          <span className="text-base font-bold text-emerald-800">{property.roadDistanceMeters ?? 60}m</span>
-          <span className="text-[10px] text-emerald-600 block">{property.roadType ?? 'Tar Road'}</span>
+          <span className="text-base font-bold text-emerald-800">
+            {property.roadDistanceMeters ? `~${property.roadDistanceMeters}m` : 'Unverified'}
+          </span>
+          <span className="text-[10px] text-emerald-600 block">
+            {property.roadDistanceMeters ? `${property.roadType ?? 'Road'} (Estimated)` : 'No calculation available'}
+          </span>
         </div>
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
           <span className="text-xs text-gray-400 block">Verification</span>
           <span className="text-base font-bold text-yellow-700 capitalize">{property.verificationStatus}</span>
-          <span className="text-[10px] text-yellow-600 block">Demo Record</span>
+          <span className="text-[10px] text-yellow-600 block">Demo Record (Not Official)</span>
         </div>
       </div>
 
@@ -125,7 +142,7 @@ export default function PropertyDetails() {
           <span>🏛️</span> Official Maharashtra Record Verification
         </h3>
         <p className="text-amber-800">
-          Verify authentic 7/12 (सातबारा), 8A khate-utara, and survey boundaries for Survey <strong>{property.surveyNumber}</strong> directly through Maharashtra Revenue Department services:
+          This demo entry ({property.surveyNumber}) is for demonstration purposes. To view genuine official 7/12 (सातबारा), 8A khate-utara, or cadastral boundaries in {property.taluka}, visit the Maharashtra Revenue Department portals:
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <a
@@ -134,7 +151,7 @@ export default function PropertyDetails() {
             rel="noopener noreferrer"
             className="px-3 py-1.5 bg-amber-800 text-white rounded font-medium hover:bg-amber-900"
           >
-            Search on Mahabhulekh 7/12 →
+            Search Official Mahabhulekh Portal →
           </a>
           <a
             href="https://mahabhunakasha.mahabhumi.gov.in/"
@@ -142,7 +159,7 @@ export default function PropertyDetails() {
             rel="noopener noreferrer"
             className="px-3 py-1.5 bg-white border border-amber-400 text-amber-900 rounded font-medium hover:bg-amber-100"
           >
-            View Cadastral Map (भू-नकाशा) →
+            Open Official Cadastral Map (भू-नकाशा) →
           </a>
           <button
             onClick={() => navigate('/records')}

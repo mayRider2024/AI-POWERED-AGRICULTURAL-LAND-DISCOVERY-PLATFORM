@@ -66,9 +66,24 @@ export default function LandRecords() {
     },
   ];
 
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setUploadError(null);
     if (file) {
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setUploadError('File size exceeds the 10MB limit. Please upload a smaller document.');
+        return;
+      }
+      // Validate file format (PDF, JPEG, PNG, WEBP)
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setUploadError('Unsupported file format. Please upload a PDF or image (JPG, PNG, WEBP).');
+        return;
+      }
+
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       setExtractedInfo(null);
@@ -79,8 +94,10 @@ export default function LandRecords() {
   const handleAnalyzeDocument = () => {
     if (!selectedFile) return;
     setIsAnalyzing(true);
+    setUploadError(null);
 
-    // AI Assisted Document parsing with Hectare - Are (हे.आर.) conversion
+    // Document parsing sandbox: Client-side simulated OCR with Hectare - Are (हे.आर.) conversion
+    // IMPORTANT: File is NOT published to any public server or directory.
     // 1 Hectare = 100 Ares = 2.471 Acres = 98.84 Gunthas
     // 1 Are = 1 Guntha (approx in Maharashtra rural revenue accounting)
     setTimeout(() => {
@@ -293,6 +310,12 @@ export default function LandRecords() {
               <span className="text-xs text-gray-400 block">PDF, PNG, JPG up to 10MB</span>
             </label>
 
+            {uploadError && (
+              <div className="mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                ⚠️ {uploadError}
+              </div>
+            )}
+
             {previewUrl && (
               <div className="mt-3 w-full">
                 <img
@@ -303,7 +326,7 @@ export default function LandRecords() {
               </div>
             )}
 
-            {selectedFile && (
+            {selectedFile && !uploadError && (
               <button
                 onClick={handleAnalyzeDocument}
                 disabled={isAnalyzing}
