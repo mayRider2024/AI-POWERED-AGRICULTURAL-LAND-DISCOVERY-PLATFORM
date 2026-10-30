@@ -114,6 +114,37 @@ export default function Profile() {
         <p className="text-xs text-gray-400 text-center">Preferences are stored locally in your browser only.</p>
       </div>
 
+      {/* Feature Navigation Shortcuts */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+        <h2 className="font-semibold text-gray-700 text-sm">Platform Tools</h2>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <a
+            href="/records"
+            className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:bg-gray-100 font-medium text-gray-800"
+          >
+            <span>📜</span> Land Records (7/12)
+          </a>
+          <a
+            href="/intelligence"
+            className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:bg-gray-100 font-medium text-gray-800"
+          >
+            <span>📊</span> Intelligence Report
+          </a>
+          <a
+            href="/compare"
+            className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:bg-gray-100 font-medium text-gray-800"
+          >
+            <span>⚖️</span> Compare Lands
+          </a>
+          <a
+            href="/broker"
+            className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:bg-gray-100 font-medium text-gray-800"
+          >
+            <span>🤝</span> Broker Portal
+          </a>
+        </div>
+      </div>
+
       {/* About section */}
       <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
         <h3 className="font-semibold text-blue-800 text-sm mb-1">About LandLens AI</h3>

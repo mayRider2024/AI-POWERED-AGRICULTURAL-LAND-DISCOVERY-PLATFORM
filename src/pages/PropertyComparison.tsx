@@ -104,6 +104,13 @@ export default function PropertyComparison() {
               </tr>
 
               <tr>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Rate per Acre</td>
+                {comparedProperties.map((p) => (
+                  <td key={p.id} className="p-3.5 font-semibold text-gray-700">₹{(p.pricePerGuntha * 40).toLocaleString()}</td>
+                ))}
+              </tr>
+
+              <tr>
                 <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Total Asking Price</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5 font-bold text-green-700 text-sm">

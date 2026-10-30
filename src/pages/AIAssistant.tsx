@@ -468,7 +468,12 @@ export default function AIAssistant() {
                         <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">DEMO</span>
                       </div>
                       <p className="text-xs text-gray-500 mt-0.5">{p.district} · {p.taluka} · {p.village}</p>
-                      <p className="text-xs text-green-700 font-semibold mt-1">₹{p.totalPrice.toLocaleString()} · {p.areaAcres} acres</p>
+                      <p className="text-xs text-green-700 font-semibold mt-1">
+                        ₹{p.totalPrice.toLocaleString()} · {p.areaAcres} acres
+                        <span className="text-[10px] text-gray-500 font-normal block">
+                          ₹{p.pricePerGuntha.toLocaleString()} / guntha · ₹{(p.pricePerGuntha * 40).toLocaleString()} / acre
+                        </span>
+                      </p>
                       <div className="flex gap-1.5 mt-2">
                         <button
                           onClick={() => navigate(`/property/${p.id}`)}

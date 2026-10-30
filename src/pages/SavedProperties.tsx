@@ -67,9 +67,12 @@ export default function SavedProperties() {
                   {p.taluka} · {p.village}
                 </p>
 
-                <div className="flex gap-4 text-sm mb-3">
-                  <span className="text-gray-700">📐 {p.areaAcres} acres</span>
-                  <span className="text-green-700 font-semibold">₹{p.totalPrice.toLocaleString()}</span>
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm mb-3">
+                  <span className="text-gray-700">📐 {p.areaAcres} acres ({p.areaAcres * 40} gunthas)</span>
+                  <span className="text-green-700 font-bold">₹{p.totalPrice.toLocaleString()}</span>
+                  <span className="text-xs text-gray-500">
+                    (₹{p.pricePerGuntha.toLocaleString()} / guntha · ₹{(p.pricePerGuntha * 40).toLocaleString()} / ac)
+                  </span>
                 </div>
 
                 <div className="flex gap-2">

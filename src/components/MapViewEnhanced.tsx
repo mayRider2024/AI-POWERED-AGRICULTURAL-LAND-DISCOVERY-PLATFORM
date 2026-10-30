@@ -308,9 +308,12 @@ export default function MapViewEnhanced() {
                   <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">DEMO / UNVERIFIED</span>
                 </div>
                 <p className="text-sm text-gray-600">{p.taluka} · {p.village}</p>
-                <div className="flex gap-4 mt-2 text-sm">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-2 text-sm">
                   <span className="text-gray-700">📐 {p.areaAcres} acres</span>
-                  <span className="text-green-700 font-medium">₹{p.totalPrice.toLocaleString()}</span>
+                  <span className="text-green-700 font-semibold">₹{p.totalPrice.toLocaleString()}</span>
+                  <span className="text-xs text-gray-500">
+                    (₹{p.pricePerGuntha.toLocaleString()} / guntha · ₹{(p.pricePerGuntha * 40).toLocaleString()} / ac)
+                  </span>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button
@@ -354,7 +357,12 @@ export default function MapViewEnhanced() {
             <div className="mt-2 text-sm text-gray-600 space-y-1">
               <p>{selectedProperty.taluka} · {selectedProperty.village}</p>
               <p>📐 {selectedProperty.areaAcres} acres ({(selectedProperty.areaAcres * 40).toFixed(0)} gunthas)</p>
-              <p className="text-green-700 font-bold">₹{selectedProperty.totalPrice.toLocaleString()} <span className="text-xs text-gray-500 font-normal">asking</span></p>
+              <p className="text-green-700 font-bold">
+                ₹{selectedProperty.totalPrice.toLocaleString()} <span className="text-xs text-gray-500 font-normal">asking</span>
+                <span className="block text-xs text-gray-500 font-normal">
+                  ₹{selectedProperty.pricePerGuntha.toLocaleString()} / guntha · ₹{(selectedProperty.pricePerGuntha * 40).toLocaleString()} / ac
+                </span>
+              </p>
               {selectedProperty.roadDistanceMeters && (
                 <p className="text-xs text-gray-500">
                   🛣️ ~{selectedProperty.roadDistanceMeters}m to {selectedProperty.roadType || 'road'} (Estimated from demo point, not verified access)

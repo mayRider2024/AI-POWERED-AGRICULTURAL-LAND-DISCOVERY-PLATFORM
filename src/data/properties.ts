@@ -1,3 +1,5 @@
+import { calculateTotalPrice } from '../utils/calculations';
+
 export type Property = {
   id: string;
   surveyNumber: string;
@@ -24,7 +26,7 @@ export const properties: Property[] = [
     village: 'Uppal',
     areaAcres: 2.5,
     pricePerGuntha: 50000,
-    totalPrice: 5000000, // 2.5 ac * 40 gunthas * ₹50,000 = ₹50,00,000 (₹50 Lakh)
+    totalPrice: calculateTotalPrice(2.5, 50000), // 2.5 ac * 40 gunthas * ₹50,000 = ₹50,00,000 (₹50 Lakh)
     coordinates: [73.15, 18.6],
     verificationStatus: 'unverified',
     roadDistanceMeters: 45,
@@ -39,7 +41,7 @@ export const properties: Property[] = [
     village: 'Kashipur',
     areaAcres: 1.8,
     pricePerGuntha: 52000,
-    totalPrice: 3744000, // 1.8 ac * 40 gunthas * ₹52,000 = ₹37,44,000 (₹37.44 Lakh)
+    totalPrice: calculateTotalPrice(1.8, 52000), // 1.8 ac * 40 gunthas * ₹52,000 = ₹37,44,000 (₹37.44 Lakh)
     coordinates: [73.25, 18.78],
     verificationStatus: 'unverified',
     roadDistanceMeters: 120,
@@ -55,7 +57,7 @@ export const properties: Property[] = [
     village: 'Dhumal',
     areaAcres: 3.0,
     pricePerGuntha: 48000,
-    totalPrice: 5760000, // 3.0 ac * 40 gunthas * ₹48,000 = ₹57,60,000 (₹57.60 Lakh)
+    totalPrice: calculateTotalPrice(3.0, 48000), // 3.0 ac * 40 gunthas * ₹48,000 = ₹57,60,000 (₹57.60 Lakh)
     coordinates: [73.05, 19.25],
     verificationStatus: 'unverified',
     roadDistanceMeters: 80,
@@ -70,7 +72,7 @@ export const properties: Property[] = [
     village: 'Nandur',
     areaAcres: 2.2,
     pricePerGuntha: 47000,
-    totalPrice: 4136000, // 2.2 ac * 40 gunthas * ₹47,000 = ₹41,36,000 (₹41.36 Lakh)
+    totalPrice: calculateTotalPrice(2.2, 47000), // 2.2 ac * 40 gunthas * ₹47,000 = ₹41,36,000 (₹41.36 Lakh)
     coordinates: [73.12, 19.35],
     verificationStatus: 'unverified',
     roadDistanceMeters: 210,
@@ -85,7 +87,7 @@ export const properties: Property[] = [
     village: 'Kadam',
     areaAcres: 1.2,
     pricePerGuntha: 51000,
-    totalPrice: 2448000, // 1.2 ac * 40 gunthas * ₹51,000 = ₹24,48,000 (₹24.48 Lakh)
+    totalPrice: calculateTotalPrice(1.2, 51000), // 1.2 ac * 40 gunthas * ₹51,000 = ₹24,48,000 (₹24.48 Lakh)
     coordinates: [73.33, 18.55],
     verificationStatus: 'unverified',
     roadDistanceMeters: 60,
@@ -100,7 +102,7 @@ export const properties: Property[] = [
     village: 'Murdadi',
     areaAcres: 2.7,
     pricePerGuntha: 46000,
-    totalPrice: 4968000, // 2.7 ac * 40 gunthas * ₹46,000 = ₹49,68,000 (₹49.68 Lakh)
+    totalPrice: calculateTotalPrice(2.7, 46000), // 2.7 ac * 40 gunthas * ₹46,000 = ₹49,68,000 (₹49.68 Lakh)
     coordinates: [72.9, 19.4],
     verificationStatus: 'unverified',
     roadDistanceMeters: 95,
@@ -116,7 +118,7 @@ export const properties: Property[] = [
     village: 'Apta',
     areaAcres: 10.0,
     pricePerGuntha: 1250000, // ₹12.5 lakh per guntha (matches "between ₹10 lakh and ₹15 lakh per guntha")
-    totalPrice: 500000000, // 10 ac * 40 * 12.5 lakh
+    totalPrice: calculateTotalPrice(10.0, 1250000), // 10 ac * 40 * 12.5 lakh = ₹50,00,00,000 (₹50 Crore)
     coordinates: [73.11, 18.99],
     verificationStatus: 'unverified',
     roadDistanceMeters: 75, // within 100 metres of a road

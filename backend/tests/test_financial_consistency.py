@@ -164,3 +164,43 @@ def test_marathi_multi_number_queries():
     assert f2.district == "Raigad"
     assert f2.survey_number == "45"
     assert f2.min_area_acres == 2.0
+
+def test_price_per_acre_and_demo_disclaimers_regression():
+    """Verify regression test for:
+    1. total_price = area_acres * 40 * price_per_guntha
+    2. price_per_acre = price_per_guntha * 40
+    3. R-001 (2.5 ac @ 50,000/guntha) -> ₹50,00,000 total and ₹20,00,000 per acre
+    4. 125/2 (10 ac @ 12.5 lakh/guntha) -> ₹50,00,00,000 total and ₹5,00,00,000 per acre
+    """
+    # Demo property R-001
+    area = 2.5
+    price_per_guntha = 50000.0
+    gunthas, total = PropertyListing.calculate_derived(area, price_per_guntha)
+    price_per_acre = price_per_guntha * GUNTHAS_PER_ACRE
+    assert total == 5000000.0  # ₹50,00,000
+    assert price_per_acre == 2000000.0  # ₹20,00,000 per acre
+    assert gunthas == 100.0
+
+    # Demo property 125/2 in Panvel
+    area_panvel = 10.0
+    price_per_guntha_panvel = 1250000.0  # ₹12.5 lakh / guntha
+    gunthas_p, total_p = PropertyListing.calculate_derived(area_panvel, price_per_guntha_panvel)
+    price_per_acre_p = price_per_guntha_panvel * GUNTHAS_PER_ACRE
+    assert total_p == 500000000.0  # ₹50 Crore
+    assert price_per_acre_p == 50000000.0  # ₹5 Crore per acre
+    assert gunthas_p == 400.0
+
+def test_demo_disclaimers_consistency():
+    """Verify that demo listings are labeled unverified and never authenticated as govt records."""
+    from app.db.session import SessionLocal
+    session = SessionLocal()
+    try:
+        props = session.query(PropertyListing).filter(PropertyListing.source_type == "demo").all()
+        for p in props:
+            # Must never be marked verified
+            assert p.verification_status == "unverified"
+            assert p.provenance_type == "demo"
+            assert p.verified_at is None
+    finally:
+        session.close()
+

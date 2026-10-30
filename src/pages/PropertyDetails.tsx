@@ -2,6 +2,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { properties } from '../data/properties';
 import { useSaved } from '../context/SavedPropertiesContext';
+import { calculateGunthas, calculatePricePerAcre, formatINR, formatLakh } from '../utils/calculations';
 
 
 export default function PropertyDetails() {
@@ -27,7 +28,8 @@ export default function PropertyDetails() {
   }
 
   const isSaved = savedIds.includes(property.id);
-  const gunthas = property.areaAcres * 40;
+  const gunthas = calculateGunthas(property.areaAcres);
+  const pricePerAcre = calculatePricePerAcre(property.pricePerGuntha);
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5 bg-white rounded-xl shadow-sm border border-gray-200">
@@ -76,8 +78,10 @@ export default function PropertyDetails() {
           </div>
           <div className="text-right">
             <span className="text-xs text-gray-400 block font-medium">Asking Price</span>
-            <span className="text-2xl font-bold text-green-700">₹{property.totalPrice.toLocaleString()}</span>
-            <span className="text-xs text-gray-500 block">₹{(property.totalPrice / 100000).toFixed(2)} Lakh (₹{property.pricePerGuntha.toLocaleString()} / guntha)</span>
+            <span className="text-2xl font-bold text-green-700">{formatINR(property.totalPrice)}</span>
+            <span className="text-xs text-gray-500 block">
+              {formatLakh(property.totalPrice)} ({formatINR(property.pricePerGuntha)} / guntha · {formatINR(pricePerAcre)} / ac)
+            </span>
           </div>
         </div>
       </div>
