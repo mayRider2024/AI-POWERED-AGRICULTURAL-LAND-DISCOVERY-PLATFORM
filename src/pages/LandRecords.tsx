@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocalization } from '../utils/localization';
 
 interface ExtractedDocInfo {
   surveyNumber?: string;
@@ -18,6 +20,15 @@ interface ExtractedDocInfo {
 }
 
 export default function LandRecords() {
+  const { t } = useTranslation();
+  const {
+    localizeDistrict,
+    localizeTaluka,
+    localizeVillage,
+    formatDigits,
+    formatNumber,
+    formatINRLocalized,
+  } = useLocalization();
   const [district, setDistrict] = useState('Raigad');
   const [taluka, setTaluka] = useState('Alibag');
   const [village, setVillage] = useState('');
@@ -72,12 +83,10 @@ export default function LandRecords() {
     const file = e.target.files?.[0];
     setUploadError(null);
     if (file) {
-      // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         setUploadError('File size exceeds the 10MB limit. Please upload a smaller document.');
         return;
       }
-      // Validate file format (PDF, JPEG, PNG, WEBP)
       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
         setUploadError('Unsupported file format. Please upload a PDF or image (JPG, PNG, WEBP).');
@@ -96,16 +105,12 @@ export default function LandRecords() {
     setIsAnalyzing(true);
     setUploadError(null);
 
-    // Document parsing sandbox: Client-side simulated OCR with Hectare - Are (हे.आर.) conversion
-    // IMPORTANT: File is NOT published to any public server or directory.
-    // 1 Hectare = 100 Ares = 2.471 Acres = 98.84 Gunthas
-    // 1 Are = 1 Guntha (approx in Maharashtra rural revenue accounting)
     setTimeout(() => {
       setIsAnalyzing(false);
       const parsedHectares = 1.01;
       const parsedAres = 17;
-      const totalAres = (parsedHectares * 100) + parsedAres; // 118 Ares = 118 Gunthas
-      const totalAcres = Number((totalAres / 40).toFixed(2)); // ~2.95 acres
+      const totalAres = (parsedHectares * 100) + parsedAres;
+      const totalAcres = Number((totalAres / 40).toFixed(2));
 
       const info: ExtractedDocInfo = {
         surveyNumber: surveyNumber || '125/2',
@@ -135,8 +140,7 @@ export default function LandRecords() {
   };
 
   const handleSaveReviewed = () => {
-    // Save to private local user-authenticated sandbox
-    setSaveSuccessMessage(`Successfully verified and imported Survey ${editSurvey} into your private land records vault.`);
+    setSaveSuccessMessage(`✓ Verified & saved Survey ${editSurvey}`);
     setShowReviewModal(false);
   };
 
@@ -146,9 +150,9 @@ export default function LandRecords() {
       <div className="flex items-center gap-3">
         <span className="text-3xl">📜</span>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Maharashtra Land Records & Survey Search</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t('landRecords.title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500">
-            Official Bhulekh deep links, 7/12 extract assistant, and legal cadastral records guidance
+            {t('landRecords.sub')}
           </p>
         </div>
       </div>
@@ -156,32 +160,32 @@ export default function LandRecords() {
       {/* Compliance / Legal Transparency Notice */}
       <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg text-xs text-amber-900 space-y-1">
         <p className="font-bold flex items-center gap-1.5 text-sm">
-          <span>⚖️</span> Legal Notice & Official Compliance
+          <span>⚖️</span> {t('landRecords.legalNoticeTitle')}
         </p>
         <p>
-          LandLens AI connects directly with authorized, publicly accessible Maharashtra State portals. In accordance with government policy and data privacy regulations, official land records must be verified on Mahabhulekh. Bulk automated scraping of survey numbers without official government API authorization is strictly not supported.
+          {t('landRecords.legalNoticeText')}
         </p>
       </div>
 
       {/* Lookup Workflow Form */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
         <h2 className="font-semibold text-gray-800 text-sm sm:text-base flex items-center gap-2">
-          <span>🔍</span> District & Survey / Gat Number Lookup
+          <span>🔍</span> {t('landRecords.lookupTitle')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">District (जिल्हा)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t('landRecords.districtLabel')}</label>
             <select
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
             >
-              <option value="Raigad">Raigad (रायगड)</option>
-              <option value="Palghar">Palghar (पालघर)</option>
+              <option value="Raigad">{localizeDistrict('Raigad')}</option>
+              <option value="Palghar">{localizeDistrict('Palghar')}</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Taluka (तालुका)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t('landRecords.talukaLabel')}</label>
             <select
               value={taluka}
               onChange={(e) => setTaluka(e.target.value)}
@@ -189,38 +193,38 @@ export default function LandRecords() {
             >
               {district === 'Raigad' ? (
                 <>
-                  <option value="Panvel">Panvel (पनवेल)</option>
-                  <option value="Alibag">Alibag (अलिबाग)</option>
-                  <option value="Pen">Pen (पेण)</option>
-                  <option value="Mhasala">Mhasala (म्हसळा)</option>
-                  <option value="Roha">Roha (रोहा)</option>
+                  <option value="Panvel">{localizeTaluka('Panvel')}</option>
+                  <option value="Alibag">{localizeTaluka('Alibag')}</option>
+                  <option value="Pen">{localizeTaluka('Pen')}</option>
+                  <option value="Mhasala">{localizeTaluka('Mhasala')}</option>
+                  <option value="Roha">{localizeTaluka('Roha')}</option>
                 </>
               ) : (
                 <>
-                  <option value="Palghar">Palghar (पालघर)</option>
-                  <option value="Dahanu">Dahanu (डहाणू)</option>
-                  <option value="Talasari">Talasari (तलासरी)</option>
-                  <option value="Vikramgad">Vikramgad (विक्रमगड)</option>
-                  <option value="Wada">Wada (वाडा)</option>
+                  <option value="Palghar">{localizeTaluka('Palghar')}</option>
+                  <option value="Dahanu">{localizeTaluka('Dahanu')}</option>
+                  <option value="Talasari">{localizeTaluka('Talasari')}</option>
+                  <option value="Vikramgad">{localizeTaluka('Vikramgad')}</option>
+                  <option value="Wada">{localizeTaluka('Wada')}</option>
                 </>
               )}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Village (गाव)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t('landRecords.villageLabel')}</label>
             <input
               type="text"
-              placeholder="e.g. Apta / Uppal"
+              placeholder={t('landRecords.villagePlaceholder')}
               value={village}
               onChange={(e) => setVillage(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Survey / Gat No. (सर्व्हे / गट)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{t('landRecords.surveyLabel')}</label>
             <input
               type="text"
-              placeholder="e.g. 125/2 or 48"
+              placeholder={t('landRecords.surveyPlaceholder')}
               value={surveyNumber}
               onChange={(e) => setSurveyNumber(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
@@ -235,7 +239,7 @@ export default function LandRecords() {
             rel="noopener noreferrer"
             className="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors inline-flex items-center gap-1.5"
           >
-            <span>🔗</span> Open Bhulekh 7/12 for {taluka}
+            <span>🔗</span> {t('landRecords.openBhulekhTaluka', { taluka: localizeTaluka(taluka) })}
           </a>
           <a
             href={`https://mahabhunakasha.mahabhumi.gov.in/`}
@@ -243,14 +247,14 @@ export default function LandRecords() {
             rel="noopener noreferrer"
             className="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors inline-flex items-center gap-1.5"
           >
-            <span>🗺</span> Open Mahabhunakasha Cadastral Map
+            <span>🗺</span> {t('landRecords.openMahabhunakasha')}
           </a>
         </div>
       </div>
 
       {/* Official Maharashtra Portals */}
       <div className="space-y-3">
-        <h2 className="text-base font-bold text-gray-800">Official Maharashtra Land Records Services</h2>
+        <h2 className="text-base font-bold text-gray-800">{t('landRecords.officialServicesTitle')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {officialLinks.map((link) => (
             <div key={link.url} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
@@ -269,7 +273,7 @@ export default function LandRecords() {
                 rel="noopener noreferrer"
                 className="text-xs font-semibold text-green-700 hover:text-green-800 inline-flex items-center gap-1"
               >
-                Access Official Service →
+                {t('landRecords.accessOfficialService')}
               </a>
             </div>
           ))}
@@ -281,14 +285,14 @@ export default function LandRecords() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
           <div>
             <h2 className="font-bold text-gray-800 text-base flex items-center gap-2">
-              <span>📑</span> AI Document Assistant (7/12 & Survey Extract)
+              <span>📑</span> {t('landRecords.aiAssistantTitle')}
             </h2>
             <p className="text-xs text-gray-500">
-              Upload your legally obtained 7/12 extract or Nakasha for automated parameter extraction and verification.
+              {t('landRecords.aiAssistantSub')}
             </p>
           </div>
           <span className="text-[11px] bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full font-medium">
-            Unverified — User Uploaded
+            {t('landRecords.unverifiedBadge')}
           </span>
         </div>
 
@@ -305,9 +309,9 @@ export default function LandRecords() {
             <label htmlFor="doc-upload" className="cursor-pointer space-y-2">
               <span className="text-4xl block">📄</span>
               <span className="text-sm font-medium text-green-700 hover:underline block">
-                {selectedFile ? selectedFile.name : 'Choose 7/12 Extract or Survey Map'}
+                {selectedFile ? selectedFile.name : t('landRecords.chooseDocument')}
               </span>
-              <span className="text-xs text-gray-400 block">PDF, PNG, JPG up to 10MB</span>
+              <span className="text-xs text-gray-400 block">{t('landRecords.fileLimits')}</span>
             </label>
 
             {uploadError && (
@@ -332,7 +336,7 @@ export default function LandRecords() {
                 disabled={isAnalyzing}
                 className="mt-4 px-4 py-2 bg-green-700 text-white rounded-lg text-xs font-semibold hover:bg-green-800 transition-colors disabled:opacity-50"
               >
-                {isAnalyzing ? 'Extracting Parameters with AI…' : 'Analyze Document with AI'}
+                {isAnalyzing ? t('landRecords.extractingParameters') : t('landRecords.analyzeDocument')}
               </button>
             )}
           </div>
@@ -340,10 +344,10 @@ export default function LandRecords() {
           {/* Extracted Fields */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs space-y-3">
             <h3 className="font-semibold text-gray-700 text-sm flex items-center justify-between">
-              <span>Extracted Fields</span>
+              <span>{t('landRecords.extractedFields')}</span>
               {extractedInfo && (
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">
-                  {Math.round(extractedInfo.confidence * 100)}% Confidence
+                  {formatDigits(Math.round(extractedInfo.confidence * 100))}% {t('landRecords.confidence')}
                 </span>
               )}
             </h3>
@@ -352,52 +356,52 @@ export default function LandRecords() {
               <div className="space-y-2 text-gray-700">
                 <div className="grid grid-cols-2 gap-2 bg-white p-2.5 rounded border border-gray-200">
                   <div>
-                    <span className="text-gray-400 block text-[10px]">Survey / Gat No</span>
+                    <span className="text-gray-400 block text-[10px]">{t('landRecords.surveyGatNo')}</span>
                     <span className="font-semibold">{extractedInfo.surveyNumber} ({extractedInfo.gatNumber})</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[10px]">Location</span>
-                    <span className="font-semibold">{extractedInfo.village}, {extractedInfo.taluka}</span>
+                    <span className="text-gray-400 block text-[10px]">{t('landRecords.location')}</span>
+                    <span className="font-semibold">{localizeVillage(extractedInfo.village || '')}, {localizeTaluka(extractedInfo.taluka || '')}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 bg-white p-2.5 rounded border border-gray-200">
                   <div>
-                    <span className="text-gray-400 block text-[10px]">Revenue Area (हे.आर.)</span>
-                    <span className="font-semibold text-green-700">{extractedInfo.areaHectares} Ha ({extractedInfo.areaAres} Ares)</span>
+                    <span className="text-gray-400 block text-[10px]">{t('landRecords.revenueArea')}</span>
+                    <span className="font-semibold text-green-700">{formatNumber(extractedInfo.areaHectares ?? 0)} Ha ({formatNumber(extractedInfo.areaAres ?? 0)} Ares)</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[10px]">Calculated Acres / Gunthas</span>
-                    <span className="font-semibold">{extractedInfo.areaAcres} ac ({extractedInfo.areaGunthas} gunthas)</span>
+                    <span className="text-gray-400 block text-[10px]">{t('landRecords.calcAcresGunthas')}</span>
+                    <span className="font-semibold">{formatNumber(extractedInfo.areaAcres ?? 0)} {t('property.acres')} ({formatNumber(extractedInfo.areaGunthas ?? 0)} {t('units.guntha')})</span>
                   </div>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-gray-200">
-                  <span className="text-gray-400 block text-[10px]">Govt Assessment (महसूल)</span>
-                  <span className="font-semibold">₹{extractedInfo.assessmentRupees}</span>
+                  <span className="text-gray-400 block text-[10px]">{t('landRecords.govtAssessment')}</span>
+                  <span className="font-semibold">{formatINRLocalized(extractedInfo.assessmentRupees ?? 0)}</span>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-gray-200">
-                  <span className="text-gray-400 block text-[10px]">Recorded Occupants (खातेदार)</span>
+                  <span className="text-gray-400 block text-[10px]">{t('landRecords.recordedOccupants')}</span>
                   <ul className="list-disc list-inside mt-0.5 space-y-0.5 font-medium">
                     {extractedInfo.occupantNames?.map((name) => (
                       <li key={name}>{name}</li>
                     ))}
                   </ul>
                   <p className="text-[10px] text-gray-400 mt-1 italic">
-                    Note: Ownership on record does not imply willingness to sell.
+                    {t('landRecords.occupantNote')}
                   </p>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-gray-200">
-                  <span className="text-gray-400 block text-[10px]">Mutations & Crops</span>
+                  <span className="text-gray-400 block text-[10px]">{t('landRecords.mutationsCrops')}</span>
                   <p className="text-gray-600">{extractedInfo.mutationNumbers?.join(', ')}</p>
                   <p className="text-gray-600 mt-0.5">{extractedInfo.cropDetails?.join(' · ')}</p>
                 </div>
 
                 {saveSuccessMessage && (
                   <div className="bg-green-50 border border-green-200 text-green-800 p-2.5 rounded text-xs">
-                    ✓ {saveSuccessMessage}
+                    {saveSuccessMessage}
                   </div>
                 )}
 
@@ -405,13 +409,13 @@ export default function LandRecords() {
                   onClick={() => setShowReviewModal(true)}
                   className="w-full py-2 bg-green-700 text-white rounded font-medium hover:bg-green-800 transition-colors text-xs flex items-center justify-center gap-1.5"
                 >
-                  <span>✏️</span> Review & Save to Private Records
+                  <span>✏️</span> {t('landRecords.reviewAndSave')}
                 </button>
               </div>
             ) : (
               <div className="h-44 flex flex-col items-center justify-center text-center text-gray-400 space-y-1">
                 <span>📑</span>
-                <p>Upload a 7/12 extract or Nakasha document to view automated field extraction.</p>
+                <p>{t('landRecords.uploadPrompt')}</p>
               </div>
             )}
           </div>
@@ -424,20 +428,20 @@ export default function LandRecords() {
           <div className="bg-white rounded-xl max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start border-b border-gray-100 pb-2">
               <div>
-                <h3 className="font-bold text-gray-800 text-base">Verify Extracted 7/12 Parameters</h3>
-                <p className="text-xs text-gray-500">Edit any values before importing into your private records</p>
+                <h3 className="font-bold text-gray-800 text-base">{t('landRecords.verifyModalTitle')}</h3>
+                <p className="text-xs text-gray-500">{t('landRecords.verifyModalSub')}</p>
               </div>
               <button onClick={() => setShowReviewModal(false)} className="text-gray-400 hover:text-gray-600 text-lg">×</button>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 p-3 rounded text-xs text-amber-900 space-y-1">
-              <p className="font-semibold">🔒 Privacy & Provenance Certification</p>
-              <p>Uploaded extracts remain encrypted and private to your account. LandLens AI does not publish personal landowner contact or identity data publicly.</p>
+              <p className="font-semibold">🔒 {t('landRecords.privacyCertTitle')}</p>
+              <p>{t('landRecords.privacyCertText')}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Survey / Gat No.</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.surveyLabel')}</label>
                 <input
                   type="text"
                   value={editSurvey}
@@ -446,7 +450,7 @@ export default function LandRecords() {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 font-medium mb-1">District</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.districtLabel')}</label>
                 <input
                   type="text"
                   value={editDistrict}
@@ -455,7 +459,7 @@ export default function LandRecords() {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Taluka</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.talukaLabel')}</label>
                 <input
                   type="text"
                   value={editTaluka}
@@ -464,7 +468,7 @@ export default function LandRecords() {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Village</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.villageLabel')}</label>
                 <input
                   type="text"
                   value={editVillage}
@@ -473,7 +477,7 @@ export default function LandRecords() {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Hectares (हे.)</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.hectaresLabel')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -483,7 +487,7 @@ export default function LandRecords() {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Ares (आर.)</label>
+                <label className="block text-gray-600 font-medium mb-1">{t('landRecords.aresLabel')}</label>
                 <input
                   type="number"
                   value={editAres}
@@ -498,13 +502,13 @@ export default function LandRecords() {
                 onClick={() => setShowReviewModal(false)}
                 className="px-4 py-2 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                {t('landRecords.cancel')}
               </button>
               <button
                 onClick={handleSaveReviewed}
                 className="px-4 py-2 bg-green-700 text-white rounded text-xs font-semibold hover:bg-green-800 transition-colors"
               >
-                Confirm & Save Record
+                {t('landRecords.confirmSave')}
               </button>
             </div>
           </div>

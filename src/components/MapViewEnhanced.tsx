@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { useTranslation } from 'react-i18next';
 import { useSaved } from '../context/SavedPropertiesContext';
 import { properties } from '../data/properties';
 import { useNavigate } from 'react-router-dom';
+import { useLocalization } from '../utils/localization';
 
 // Tell MapLibre where to find its Web Worker.
 // Vite's ?url suffix copies the file to dist/assets/ and returns its URL.
@@ -16,6 +18,16 @@ export default function MapViewEnhanced() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const {
+    localizeDistrict,
+    localizeLocation,
+    localizeRoadType,
+    formatSmartPrice,
+    formatDigits,
+    formatNumber,
+    formatINRLocalized,
+  } = useLocalization();
 
   const [isLoading, setIsLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -159,16 +171,16 @@ export default function MapViewEnhanced() {
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-2 bg-white border-b border-gray-200 z-10 flex-shrink-0 w-full overflow-x-auto">
         <button
-          className="px-3 py-1.5 bg-green-700 text-white rounded text-sm font-medium hover:bg-green-800 transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded text-sm font-medium hover:opacity-95 shadow-sm transition-all whitespace-nowrap"
           onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
         >
-          {viewMode === 'map' ? '☰ List View' : '🗺 Map View'}
+          {viewMode === 'map' ? t('explore.listView') : t('explore.mapView')}
         </button>
         <button
-          className="px-3 py-1.5 bg-blue-700 text-white rounded text-sm font-medium hover:bg-blue-800 transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 rounded text-sm font-medium hover:bg-gray-200 transition-colors whitespace-nowrap"
           onClick={() => setShowFilters(!showFilters)}
         >
-          ⚙ Filters {filterDistrict || filterTaluka || filterVillage || minArea !== '' || maxPrice !== '' || maxRoadDist !== '' ? '●' : ''}
+          {t('explore.filters')} {filterDistrict || filterTaluka || filterVillage || minArea !== '' || maxPrice !== '' || maxRoadDist !== '' ? '●' : ''}
         </button>
         <select
           value={mapStyle}
@@ -180,7 +192,7 @@ export default function MapViewEnhanced() {
           <option value="positron">Positron (Clean)</option>
           <option value="bright">Bright (Vibrant)</option>
         </select>
-        <span className="ml-auto text-xs text-gray-500 whitespace-nowrap pl-1">{filteredProperties.length} properties</span>
+        <span className="ml-auto text-xs text-gray-500 whitespace-nowrap pl-1">{t('home.listingsCount', { count: formatDigits(filteredProperties.length) })}</span>
       </div>
 
       {/* Filter panel */}
@@ -191,41 +203,41 @@ export default function MapViewEnhanced() {
             onChange={(e) => setFilterDistrict(e.target.value)}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-auto"
           >
-            <option value="">All Districts</option>
+            <option value="">{t('explore.allDistricts')}</option>
             <option value="Raigad">Raigad</option>
             <option value="Palghar">Palghar</option>
           </select>
           <input
             type="text"
-            placeholder="Taluka"
+            placeholder={t('explore.talukaPlaceholder')}
             value={filterTaluka}
             onChange={(e) => setFilterTaluka(e.target.value)}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-28"
           />
           <input
             type="text"
-            placeholder="Village"
+            placeholder={t('explore.villagePlaceholder')}
             value={filterVillage}
             onChange={(e) => setFilterVillage(e.target.value)}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-28"
           />
           <input
             type="number"
-            placeholder="Min Area (ac)"
+            placeholder={t('explore.minAreaPlaceholder')}
             value={minArea}
             onChange={(e) => setMinArea(e.target.value ? Number(e.target.value) : '')}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-32"
           />
           <input
             type="number"
-            placeholder="Max Price (₹)"
+            placeholder={t('explore.maxPricePlaceholder')}
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : '')}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-32"
           />
           <input
             type="number"
-            placeholder="Max Road Dist (m)"
+            placeholder={t('explore.maxRoadPlaceholder')}
             value={maxRoadDist}
             onChange={(e) => setMaxRoadDist(e.target.value ? Number(e.target.value) : '')}
             className="border bg-white rounded px-2 py-1.5 text-sm w-full sm:w-36"
@@ -242,7 +254,7 @@ export default function MapViewEnhanced() {
               setMaxRoadDist('');
             }}
           >
-            Clear
+            {t('explore.clear')}
           </button>
         </div>
       )}
@@ -252,9 +264,9 @@ export default function MapViewEnhanced() {
         {/* Loading overlay */}
         {isLoading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-20">
-            <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-3" />
-            <p className="text-gray-600 text-sm">Loading map tiles…</p>
-            <p className="text-gray-400 text-xs mt-1">Connecting to OpenFreeMap</p>
+            <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mb-3" />
+            <p className="text-gray-600 text-sm">{t('explore.loadingMap')}</p>
+            <p className="text-gray-400 text-xs mt-1">{t('explore.connectingTiles')}</p>
           </div>
         )}
 
@@ -262,19 +274,19 @@ export default function MapViewEnhanced() {
         {!isLoading && mapError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-20 p-6 text-center">
             <div className="text-4xl mb-3">🗺️</div>
-            <p className="text-red-600 font-medium mb-1">Map tiles unavailable</p>
+            <p className="text-red-600 font-medium mb-1">{t('explore.mapUnavailable')}</p>
             <p className="text-gray-500 text-sm mb-4">{mapError}</p>
             <button
               onClick={initMap}
-              className="px-4 py-2 bg-green-700 text-white rounded font-medium hover:bg-green-800 transition-colors"
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded font-medium hover:opacity-95 shadow-sm transition-all"
             >
-              Retry
+              {t('explore.retry')}
             </button>
             <button
               onClick={() => setViewMode('list')}
               className="mt-2 px-4 py-2 bg-gray-200 rounded text-sm hover:bg-gray-300"
             >
-              View as List instead
+              {t('explore.viewListInstead')}
             </button>
           </div>
         )}
@@ -290,7 +302,7 @@ export default function MapViewEnhanced() {
         {viewMode === 'list' && (
           <div className="absolute inset-0 overflow-auto p-4 space-y-3">
             {filteredProperties.length === 0 && (
-              <p className="text-gray-500 text-center mt-8">No properties match the current filters.</p>
+              <p className="text-gray-500 text-center mt-8">{t('explore.noMatch')}</p>
             )}
             {filteredProperties.map((p) => (
               <div
@@ -301,32 +313,32 @@ export default function MapViewEnhanced() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <span className="font-semibold text-gray-800">{p.surveyNumber}</span>
-                    <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-medium ${p.district === 'Raigad' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-                      {p.district}
+                    <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-medium ${p.district === 'Raigad' ? 'bg-amber-100 text-amber-800' : 'bg-orange-100 text-orange-800'}`}>
+                      {localizeDistrict(p.district)}
                     </span>
                   </div>
-                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">DEMO / UNVERIFIED</span>
+                  <span className="text-[10px] bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full font-medium">{t('common.demoUnverified')}</span>
                 </div>
-                <p className="text-sm text-gray-600">{p.taluka} · {p.village}</p>
+                <p className="text-sm text-gray-600">{localizeLocation(p.village, p.taluka, p.district)}</p>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-2 text-sm">
-                  <span className="text-gray-700">📐 {p.areaAcres} acres</span>
-                  <span className="text-green-700 font-semibold">₹{p.totalPrice.toLocaleString()}</span>
+                  <span className="text-gray-700">📐 {formatNumber(p.areaAcres)} {t('common.acres')} ({formatNumber(p.areaAcres * 40)} {t('common.gunthas')})</span>
+                  <span className="text-emerald-700 font-semibold">{formatINRLocalized(p.totalPrice)}</span>
                   <span className="text-xs text-gray-500">
-                    (₹{p.pricePerGuntha.toLocaleString()} / guntha · ₹{(p.pricePerGuntha * 40).toLocaleString()} / ac)
+                    ({formatSmartPrice(p.totalPrice)} · {formatINRLocalized(p.pricePerGuntha)} / {t('common.guntha')})
                   </span>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button
-                    className="px-3 py-1 bg-green-700 text-white rounded text-xs hover:bg-green-800"
+                    className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded text-xs font-medium hover:opacity-95 shadow-sm transition-all"
                     onClick={(e) => { e.stopPropagation(); navigate(`/property/${p.id}`); }}
                   >
-                    View Details
+                    {t('common.viewDetails')}
                   </button>
                   <button
                     className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200"
                     onClick={(e) => { e.stopPropagation(); toggleSave(p.id); }}
                   >
-                    {savedIds.includes(p.id) ? '♥ Saved' : '♡ Save'}
+                    {savedIds.includes(p.id) ? '♥ ' + t('common.saved') : '♡ ' + t('common.save')}
                   </button>
                 </div>
               </div>
@@ -340,32 +352,32 @@ export default function MapViewEnhanced() {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <span className="font-semibold text-gray-800">{selectedProperty.surveyNumber}</span>
-                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-medium ${selectedProperty.district === 'Raigad' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-                  {selectedProperty.district}
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-medium ${selectedProperty.district === 'Raigad' ? 'bg-amber-100 text-amber-800' : 'bg-orange-100 text-orange-800'}`}>
+                  {localizeDistrict(selectedProperty.district)}
                 </span>
               </div>
               <button onClick={() => setSelectedPropId(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
             </div>
             <div className="flex flex-wrap gap-1.5 mb-2">
-              <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
-                DEMO / UNVERIFIED
+              <span className="text-[10px] bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full font-bold">
+                {t('common.demoUnverified')}
               </span>
               <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                📍 Demo location — not a verified parcel boundary
+                📍 {t('explore.demoLocationNotice')}
               </span>
             </div>
             <div className="mt-2 text-sm text-gray-600 space-y-1">
-              <p>{selectedProperty.taluka} · {selectedProperty.village}</p>
-              <p>📐 {selectedProperty.areaAcres} acres ({(selectedProperty.areaAcres * 40).toFixed(0)} gunthas)</p>
-              <p className="text-green-700 font-bold">
-                ₹{selectedProperty.totalPrice.toLocaleString()} <span className="text-xs text-gray-500 font-normal">asking</span>
+              <p>{localizeLocation(selectedProperty.village, selectedProperty.taluka, selectedProperty.district)}</p>
+              <p>📐 {formatNumber(selectedProperty.areaAcres)} {t('common.acres')} ({formatNumber(selectedProperty.areaAcres * 40)} {t('common.gunthas')})</p>
+              <p className="text-emerald-700 font-bold">
+                {formatINRLocalized(selectedProperty.totalPrice)} <span className="text-xs text-gray-500 font-normal">{t('explore.asking')}</span>
                 <span className="block text-xs text-gray-500 font-normal">
-                  ₹{selectedProperty.pricePerGuntha.toLocaleString()} / guntha · ₹{(selectedProperty.pricePerGuntha * 40).toLocaleString()} / ac
+                  {formatSmartPrice(selectedProperty.totalPrice)} · {formatINRLocalized(selectedProperty.pricePerGuntha)} / {t('common.guntha')}
                 </span>
               </p>
               {selectedProperty.roadDistanceMeters && (
                 <p className="text-xs text-gray-500">
-                  🛣️ ~{selectedProperty.roadDistanceMeters}m to {selectedProperty.roadType || 'road'} (Estimated from demo point, not verified access)
+                  🛣️ ~{formatDigits(selectedProperty.roadDistanceMeters)}m {localizeRoadType(selectedProperty.roadType)} ({t('common.estimated')})
                 </p>
               )}
             </div>
@@ -376,14 +388,14 @@ export default function MapViewEnhanced() {
                 rel="noopener noreferrer"
                 className="w-full text-center py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-semibold hover:bg-amber-100"
               >
-                Search Official Mahabhulekh 7/12 Portal →
+                {t('propertyDetails.searchMahabhulekh')}
               </a>
               <div className="flex gap-2">
                 <button
-                  className="flex-1 px-3 py-1.5 bg-green-700 text-white rounded text-sm hover:bg-green-800"
+                  className="flex-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded text-sm font-medium hover:opacity-95 shadow-sm transition-all"
                   onClick={() => navigate(`/property/${selectedProperty.id}`)}
                 >
-                  View Intelligence Report
+                  {t('common.viewDetails')}
                 </button>
                 <button
                   className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"

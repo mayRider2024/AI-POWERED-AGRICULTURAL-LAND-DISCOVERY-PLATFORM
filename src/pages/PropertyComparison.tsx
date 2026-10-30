@@ -1,7 +1,20 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { properties } from '../data/properties';
+import { useLocalization } from '../utils/localization';
 
 export default function PropertyComparison() {
+  const { t } = useTranslation();
+  const {
+    localizeDistrict,
+    localizeVillage,
+    localizeTaluka,
+    localizeRoadType,
+    formatSmartPrice,
+    formatNumber,
+    formatINRLocalized,
+    formatDigits,
+  } = useLocalization();
   const [selectedIds, setSelectedIds] = useState<string[]>(['p1', 'p3']);
 
   const handleToggle = (id: string) => {
@@ -24,9 +37,9 @@ export default function PropertyComparison() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">⚖️</span>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Compare Agricultural Lands</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t('compare.title')}</h1>
             <p className="text-xs sm:text-sm text-gray-500">
-              Side-by-side comparison of acreage, price per guntha, total asking price, and road distance (Select 2 to 4 properties)
+              {t('compare.subtitle')}
             </p>
           </div>
         </div>
@@ -34,7 +47,7 @@ export default function PropertyComparison() {
 
       {/* Property Selector Pills */}
       <div className="flex flex-wrap gap-2 bg-white p-3 rounded-xl border border-gray-200 shadow-sm items-center">
-        <span className="text-xs font-semibold text-gray-600">Select Properties:</span>
+        <span className="text-xs font-semibold text-gray-600">{t('compare.selectProperties')}:</span>
         {properties.map((p) => {
           const isSelected = selectedIds.includes(p.id);
           return (
@@ -47,7 +60,7 @@ export default function PropertyComparison() {
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >
-              {isSelected ? '✓ ' : '+ '} {p.surveyNumber} ({p.district})
+              {isSelected ? '✓ ' : '+ '} {p.surveyNumber} ({localizeDistrict(p.district)})
             </button>
           );
         })}
@@ -59,89 +72,91 @@ export default function PropertyComparison() {
           <table className="w-full text-sm min-w-[640px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                <th className="text-left p-3.5 w-1/4">Metric</th>
+                <th className="text-left p-3.5 w-1/4">{t('compare.metric')}</th>
                 {comparedProperties.map((p) => (
                   <th key={p.id} className="text-left p-3.5">
                     <span className="font-bold text-gray-900 block text-sm">{p.surveyNumber}</span>
-                    <span className="text-[11px] text-gray-500 normal-case">{p.village}, {p.taluka}</span>
+                    <span className="text-[11px] text-gray-500 normal-case">
+                      {localizeVillage(p.village)}, {localizeTaluka(p.taluka)}
+                    </span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-xs text-gray-700">
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">District</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.district')}</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       p.district === 'Raigad' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                     }`}>
-                      {p.district}
+                      {localizeDistrict(p.district)}
                     </span>
                   </td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Area (Acres)</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.areaAcres')}</td>
                 {comparedProperties.map((p) => (
-                  <td key={p.id} className="p-3.5 font-medium">{p.areaAcres} Acres</td>
+                  <td key={p.id} className="p-3.5 font-medium">{formatNumber(p.areaAcres)} {t('property.acres')}</td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Area (Gunthas)</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.areaGunthas')}</td>
                 {comparedProperties.map((p) => (
-                  <td key={p.id} className="p-3.5">{p.areaAcres * 40} Gunthas</td>
+                  <td key={p.id} className="p-3.5">{formatNumber(p.areaAcres * 40)} {t('units.guntha')}</td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Price per Guntha</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.pricePerGuntha')}</td>
                 {comparedProperties.map((p) => (
-                  <td key={p.id} className="p-3.5 font-semibold">₹{p.pricePerGuntha.toLocaleString()}</td>
+                  <td key={p.id} className="p-3.5 font-semibold">{formatINRLocalized(p.pricePerGuntha)}</td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Rate per Acre</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.ratePerAcre')}</td>
                 {comparedProperties.map((p) => (
-                  <td key={p.id} className="p-3.5 font-semibold text-gray-700">₹{(p.pricePerGuntha * 40).toLocaleString()}</td>
+                  <td key={p.id} className="p-3.5 font-semibold text-gray-700">{formatINRLocalized(p.pricePerGuntha * 40)}</td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Total Asking Price</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.totalAskingPrice')}</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5 font-bold text-green-700 text-sm">
-                    ₹{p.totalPrice.toLocaleString()}
+                    {formatINRLocalized(p.totalPrice)}
                     <span className="text-[10px] text-gray-400 block font-normal">
-                      ₹{(p.totalPrice / 100000).toFixed(2)} Lakh
+                      {formatSmartPrice(p.totalPrice)}
                     </span>
                   </td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Road Distance</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.roadDistance')}</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5 font-medium text-emerald-800">
-                    {p.roadDistanceMeters ?? 60} meters
+                    {formatDigits(p.roadDistanceMeters ?? 60)} m
                   </td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Road Type</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.roadType')}</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5 text-gray-600">
-                    {p.roadType ?? 'Paved Village Road'}
+                    {localizeRoadType(p.roadType ?? 'Paved Village Road')}
                   </td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">Verification Status</td>
+                <td className="p-3.5 font-semibold text-gray-800 bg-gray-50/50">{t('compare.verificationStatus')}</td>
                 {comparedProperties.map((p) => (
                   <td key={p.id} className="p-3.5">
                     <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-medium text-[10px]">

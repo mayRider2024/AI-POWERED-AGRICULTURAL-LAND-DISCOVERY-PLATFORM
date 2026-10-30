@@ -196,10 +196,26 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         road_proximity_required=road_req,
     )
 
-def _interpret_query(query: str) -> InterpretedFilters:
+def _interpret_query(query: str, history: Optional[List[Any]] = None) -> InterpretedFilters:
     if settings.GEMINI_API_KEY:
         try:
             client = _get_gemini_client()
+            
+            # Format prior conversational messages if available (bounded to last 6 turns to manage context window)
+            context_section = ""
+            if history:
+                bounded_history = history[-6:]
+                history_lines = []
+                for msg in bounded_history:
+                    role_label = "User" if (getattr(msg, "role", None) == "user" or (isinstance(msg, dict) and msg.get("role") == "user")) else "Assistant"
+                    content_str = getattr(msg, "content", None) if not isinstance(msg, dict) else msg.get("content")
+                    if content_str:
+                        # Clean content to first 250 characters
+                        clean_content = content_str.strip()[:250].replace("\n", " ")
+                        history_lines.append(f"{role_label}: {clean_content}")
+                if history_lines:
+                    context_section = "Prior conversation context:\n" + "\n".join(history_lines) + "\n\n"
+
             prompt = (
                 "Extract structured search filters from this Indian agricultural land query in English, Hindi, or Marathi. "
                 "CRITICAL INSTRUCTIONS ON UNITS AND CONSTRAINTS: "
@@ -210,7 +226,9 @@ def _interpret_query(query: str) -> InterpretedFilters:
                 "Note: Panvel is a taluka in Raigad. 1 lakh/lac = 100,000 INR and 1 crore = 10,000,000 INR. 1 acre = 40 gunthas. "
                 "Extract survey_number if mentioned (e.g., '125/2', 'R-001', 'P-001'). "
                 "Extract max_road_distance_meters if road proximity is specified (e.g., 'within 100 metres of a road', 'no more than 100 meters from a road'). "
-                f"Query: {query}"
+                "If the query references previous constraints from conversation context (e.g. 'what about under 20 lakh instead?' or 'in Panvel now'), merge and update the filters accordingly.\n\n"
+                f"{context_section}"
+                f"Current User Query: {query}"
             )
             response = client.models.generate_content(
                 model=settings.GEMINI_MODEL,
@@ -294,8 +312,8 @@ def _diagnose_unmet_constraints(db: Session, filters: InterpretedFilters) -> Lis
     return unmet
 
 def perform_ai_search(request: AISearchRequest, db: Session) -> AISearchResponse:
-    # Interpret natural language query
-    filters = _interpret_query(request.query)
+    # Interpret natural language query with context awareness
+    filters = _interpret_query(request.query, history=getattr(request, "history", None))
     # Query DB with filters
     properties = _apply_filters(db, filters)
 

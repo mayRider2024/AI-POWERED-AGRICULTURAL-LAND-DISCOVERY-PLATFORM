@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { properties } from '../data/properties';
 import { useSaved } from '../context/SavedPropertiesContext';
+import { useLocalization } from '../utils/localization';
 
 interface ActivityEvent {
   id: string;
@@ -49,6 +50,7 @@ export default function Activity() {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const navigate = useNavigate();
   const { savedIds } = useSaved();
+  const { formatDigits, formatINRLocalized, localizeDistrict, localizeTaluka, localizeVillage } = useLocalization();
 
   useEffect(() => {
     const stored: ActivityEvent[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
@@ -83,11 +85,11 @@ export default function Activity() {
       {/* Saved count summary */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-green-50 border border-green-100 rounded-xl p-4">
-          <p className="text-3xl font-bold text-green-700">{savedIds.length}</p>
+          <p className="text-3xl font-bold text-green-700">{formatDigits(savedIds.length)}</p>
           <p className="text-sm text-green-600 mt-1">Properties saved</p>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-          <p className="text-3xl font-bold text-blue-700">{events.length}</p>
+          <p className="text-3xl font-bold text-blue-700">{formatDigits(events.length)}</p>
           <p className="text-sm text-blue-600 mt-1">Actions recorded</p>
         </div>
       </div>
@@ -105,10 +107,10 @@ export default function Activity() {
               >
                 <span className="text-lg">🌾</span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-gray-800 truncate">{p.surveyNumber} · {p.district}</p>
-                  <p className="text-xs text-gray-500 truncate">{p.taluka}, {p.village}</p>
+                  <p className="font-medium text-sm text-gray-800 truncate">{p.surveyNumber} · {localizeDistrict(p.district)}</p>
+                  <p className="text-xs text-gray-500 truncate">{localizeTaluka(p.taluka)}, {localizeVillage(p.village)}</p>
                 </div>
-                <span className="text-xs text-green-700 font-medium">₹{p.totalPrice.toLocaleString()}</span>
+                <span className="text-xs text-green-700 font-medium">{formatINRLocalized(p.totalPrice)}</span>
               </div>
             ))}
           </div>

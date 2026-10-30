@@ -1,9 +1,17 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
+
+class ChatHistoryMessage(BaseModel):
+    role: Literal["user", "assistant"] = Field(..., description="Message role")
+    content: str = Field(..., max_length=2000, description="Message text content")
+
+    model_config = ConfigDict(from_attributes=True)
 
 class AISearchRequest(BaseModel):
-    """User‑provided natural language query."""
+    """User‑provided natural language query with optional previous conversation context."""
     query: str = Field(..., min_length=1, max_length=500, description="Natural language land search query")
+    conversation_id: Optional[str] = Field(None, description="Optional UUID of active conversation")
+    history: Optional[List[ChatHistoryMessage]] = Field(default_factory=list, description="Prior conversation messages for context")
 
     model_config = ConfigDict(from_attributes=True)
 

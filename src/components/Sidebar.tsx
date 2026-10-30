@@ -1,19 +1,25 @@
 import { NavLink } from 'react-router-dom';
-
-const navItems = [
-  { to: '/explore', icon: '🗺', label: 'Explore' },
-  { to: '/saved', icon: '♥', label: 'Saved' },
-  { to: '/assistant', icon: '🤖', label: 'AI Assistant' },
-  { to: '/records', icon: '📜', label: 'Land Records' },
-  { to: '/intelligence', icon: '📊', label: 'Intelligence' },
-  { to: '/compare', icon: '⚖️', label: 'Compare' },
-  { to: '/broker', icon: '🤝', label: 'Broker Portal' },
-  { to: '/activity', icon: '📋', label: 'Activity' },
-  { to: '/profile', icon: '👤', label: 'Profile' },
-  { to: '/admin', icon: '⚙', label: 'Admin' },
-];
+import { useTranslation } from 'react-i18next';
+import { useLocalization } from '../utils/localization';
 
 export default function Sidebar() {
+  const { t } = useTranslation();
+  const { localizeDistrict } = useLocalization();
+
+  const navItems = [
+    { to: '/home', icon: '🏠', label: t('nav.home') },
+    { to: '/explore', icon: '🗺️', label: t('nav.explore') },
+    { to: '/saved', icon: '♥', label: t('nav.saved') },
+    { to: '/assistant', icon: '🤖', label: t('nav.aiAssistant') },
+    { to: '/records', icon: '📜', label: t('nav.landRecords') },
+    { to: '/intelligence', icon: '📊', label: t('nav.intelligence') },
+    { to: '/compare', icon: '⚖️', label: t('nav.compare') },
+    { to: '/broker', icon: '🤝', label: t('nav.brokerPortal') },
+    { to: '/activity', icon: '📋', label: t('nav.activity') },
+    { to: '/profile', icon: '👤', label: t('nav.profile') },
+    { to: '/admin', icon: '⚙', label: t('nav.admin') },
+  ];
+
   return (
     <aside className="w-56 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">
       {/* Brand header */}
@@ -22,7 +28,9 @@ export default function Sidebar() {
           <span className="text-2xl">🌾</span>
           <div>
             <p className="font-bold text-green-700 text-sm leading-tight">LandLens AI</p>
-            <p className="text-gray-400 text-xs leading-tight">Raigad · Palghar</p>
+            <p className="text-gray-400 text-xs leading-tight">
+              {localizeDistrict('Raigad')} · {localizeDistrict('Palghar')}
+            </p>
           </div>
         </div>
       </div>
@@ -49,7 +57,7 @@ export default function Sidebar() {
 
       {/* Footer note */}
       <div className="px-4 py-3 border-t border-gray-100">
-        <p className="text-xs text-gray-400">Demo MVP · Data is fictional</p>
+        <p className="text-xs text-gray-400">{t('disclaimer.shortNote')}</p>
       </div>
     </aside>
   );

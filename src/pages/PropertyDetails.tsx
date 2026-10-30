@@ -1,13 +1,26 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { properties } from '../data/properties';
 import { useSaved } from '../context/SavedPropertiesContext';
-import { calculateGunthas, calculatePricePerAcre, formatINR, formatLakh } from '../utils/calculations';
+import { calculateGunthas, calculatePricePerAcre } from '../utils/calculations';
+import { useLocalization } from '../utils/localization';
 
 
 export default function PropertyDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const {
+    localizeTaluka,
+    localizeVillage,
+    localizeRoadType,
+    localizeLocation,
+    formatSmartPrice,
+    formatNumber,
+    formatINRLocalized,
+    formatDigits,
+  } = useLocalization();
   const property = properties.find((p) => p.id === id);
 
   const { savedIds, toggleSave } = useSaved();
@@ -21,7 +34,7 @@ export default function PropertyDetails() {
           className="mt-2 px-3 py-1 bg-gray-600 text-white rounded"
           onClick={() => navigate(-1)}
         >
-          Go Back
+          {t('propertyDetails.back')}
         </button>
       </div>
     );
@@ -39,7 +52,7 @@ export default function PropertyDetails() {
           className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold flex items-center gap-1"
           onClick={() => navigate(-1)}
         >
-          ← Back
+          {t('propertyDetails.back')}
         </button>
         <div className="flex gap-2">
           <button
@@ -48,13 +61,13 @@ export default function PropertyDetails() {
             }`}
             onClick={() => toggleSave(property.id)}
           >
-            {isSaved ? '♥ Saved' : '♡ Save Property'}
+            {isSaved ? t('propertyDetails.savedBtn') : t('propertyDetails.saveBtn')}
           </button>
           <button
-            className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-semibold hover:bg-emerald-800"
-            onClick={() => navigate('/intelligence')}
+            className="px-3 py-1.5 bg-gradient-to-r from-[#E86A17] to-[#C54E12] text-white rounded-lg text-xs font-semibold hover:opacity-95 shadow-xs"
+            onClick={() => navigate(`/intelligence?id=${property.id}`)}
           >
-            📊 View Intelligence Report
+            {t('propertyDetails.viewIntelligence')}
           </button>
         </div>
       </div>
@@ -65,22 +78,22 @@ export default function PropertyDetails() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-400 font-semibold uppercase">
-                {property.isDemo ? 'Demo Listing' : 'Agricultural Land Parcel'}
+                {property.isDemo ? t('propertyDetails.demoListing') : t('propertyDetails.agriculturalParcel')}
               </span>
               <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
-                {property.isDemo ? 'FICTIONAL DEMO ID' : 'GOVT SURVEY'}
+                {property.isDemo ? t('propertyDetails.fictionalDemoId') : t('propertyDetails.govtSurvey')}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
-              {property.isDemo ? `Demo Reference: ${property.surveyNumber}` : `Survey No. ${property.surveyNumber}`}
+              {property.isDemo ? `${t('common.demoReference')}: ${property.surveyNumber}` : `${t('common.surveyNo')} ${property.surveyNumber}`}
             </h1>
-            <p className="text-sm text-gray-500">{property.village}, Taluka {property.taluka}, District {property.district}, Maharashtra</p>
+            <p className="text-sm text-gray-500">{localizeLocation(property.village, property.taluka, property.district)}</p>
           </div>
           <div className="text-right">
-            <span className="text-xs text-gray-400 block font-medium">Asking Price</span>
-            <span className="text-2xl font-bold text-green-700">{formatINR(property.totalPrice)}</span>
-            <span className="text-xs text-gray-500 block">
-              {formatLakh(property.totalPrice)} ({formatINR(property.pricePerGuntha)} / guntha · {formatINR(pricePerAcre)} / ac)
+            <span className="text-xs text-gray-400 block font-medium">{t('common.askingPrice')}</span>
+            <span className="text-2xl font-bold text-[#C54E12]">{formatINRLocalized(property.totalPrice)}</span>
+            <span className="text-xs text-gray-500 block font-medium">
+              {formatSmartPrice(property.totalPrice)} ({formatINRLocalized(property.pricePerGuntha)} / {t('common.guntha')} · {formatINRLocalized(pricePerAcre)} / {t('common.acre')})
             </span>
           </div>
         </div>
@@ -88,25 +101,27 @@ export default function PropertyDetails() {
 
       {/* Photo Gallery Simulation / Land Visualization */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 rounded-xl overflow-hidden">
-        <div className="sm:col-span-2 h-56 bg-gradient-to-br from-green-800 to-emerald-900 rounded-lg flex flex-col items-center justify-center text-white p-4 text-center">
+        <div className="sm:col-span-2 h-56 bg-gradient-to-br from-amber-700 to-orange-900 rounded-lg flex flex-col items-center justify-center text-white p-4 text-center">
           <span className="text-4xl mb-2">🌾</span>
-          <span className="font-bold text-base">Agricultural Land Plot {property.surveyNumber}</span>
-          <span className="text-xs text-green-200 mt-1">{property.areaAcres} Acres ({gunthas} Gunthas) · Demo Land Concept</span>
-          <span className="text-[10px] bg-black/30 px-2 py-0.5 rounded mt-3">Demo Coordinates: {property.coordinates[1]}°N, {property.coordinates[0]}°E (Not a verified boundary)</span>
+          <span className="font-bold text-base">{localizeVillage(property.village)} · {property.surveyNumber}</span>
+          <span className="text-xs text-amber-100 mt-1">{formatNumber(property.areaAcres)} {t('common.acres')} ({formatNumber(gunthas)} {t('common.gunthas')})</span>
+          <span className="text-[10px] bg-black/30 px-2 py-0.5 rounded mt-3">
+            {t('propertyDetails.notVerifiedBoundary', { lat: property.coordinates[1], longitude: property.coordinates[0] })}
+          </span>
         </div>
         <div className="space-y-2">
-          <div className="h-26 bg-gradient-to-br from-lime-800 to-green-900 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
+          <div className="h-26 bg-gradient-to-br from-orange-800 to-amber-950 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
             <span className="text-2xl">🛣️</span>
-            <span className="text-xs font-semibold mt-1">Road Proximity</span>
-            <span className="text-[10px] text-green-200">
-              {property.roadDistanceMeters ? `~${property.roadDistanceMeters}m to ${property.roadType ?? 'Road'} (Demo estimate)` : 'Road distance unverified'}
+            <span className="text-xs font-semibold mt-1">{t('propertyDetails.roadProximityTitle')}</span>
+            <span className="text-[10px] text-amber-200">
+              {property.roadDistanceMeters ? t('propertyDetails.roadProximityEstimate', { distance: formatDigits(property.roadDistanceMeters), type: localizeRoadType(property.roadType) }) : t('propertyDetails.roadUnverified')}
             </span>
           </div>
-          <div className="h-26 bg-gradient-to-br from-teal-800 to-emerald-950 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
+          <div className="h-26 bg-gradient-to-br from-stone-800 to-stone-950 rounded-lg flex flex-col items-center justify-center text-white text-center p-2">
             <span className="text-2xl">📜</span>
-            <span className="text-xs font-semibold mt-1">7/12 Land Record</span>
-            <span className="text-[10px] text-teal-200">
-              {property.isDemo ? 'Unverified — Demo Record Only' : 'Official Gat No. Pending Verification'}
+            <span className="text-xs font-semibold mt-1">{t('propertyDetails.satbaraRecordTitle')}</span>
+            <span className="text-[10px] text-amber-200">
+              {t('propertyDetails.demoRecordOnly')}
             </span>
           </div>
         </div>
@@ -115,38 +130,38 @@ export default function PropertyDetails() {
       {/* Specifications Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span className="text-xs text-gray-400 block">Total Acreage</span>
-          <span className="text-base font-bold text-gray-800">{property.areaAcres} ac</span>
-          <span className="text-[10px] text-gray-500 block">{gunthas} Gunthas</span>
+          <span className="text-xs text-gray-400 block">{t('common.area')}</span>
+          <span className="text-base font-bold text-gray-800">{formatNumber(property.areaAcres)} {t('common.acre')}</span>
+          <span className="text-[10px] text-gray-500 block">{formatNumber(gunthas)} {t('common.gunthas')}</span>
         </div>
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span className="text-xs text-gray-400 block">Rate / Guntha</span>
-          <span className="text-base font-bold text-gray-800">₹{property.pricePerGuntha.toLocaleString()}</span>
-          <span className="text-[10px] text-gray-500 block">Standard Unit</span>
+          <span className="text-xs text-gray-400 block">{t('common.ratePerGuntha')}</span>
+          <span className="text-base font-bold text-gray-800">{formatINRLocalized(property.pricePerGuntha)}</span>
+          <span className="text-[10px] text-gray-500 block">{formatDigits(1)} {t('common.acre')} = {formatDigits(40)} {t('common.gunthas')}</span>
         </div>
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span className="text-xs text-gray-400 block">Road Distance</span>
+          <span className="text-xs text-gray-400 block">{t('common.roadDistance')}</span>
           <span className="text-base font-bold text-emerald-800">
-            {property.roadDistanceMeters ? `~${property.roadDistanceMeters}m` : 'Unverified'}
+            {property.roadDistanceMeters ? `~${formatDigits(property.roadDistanceMeters)}m` : t('propertyDetails.roadUnverified')}
           </span>
           <span className="text-[10px] text-emerald-600 block">
-            {property.roadDistanceMeters ? `${property.roadType ?? 'Road'} (Estimated)` : 'No calculation available'}
+            {property.roadDistanceMeters ? `${localizeRoadType(property.roadType)} (${t('common.estimated')})` : ''}
           </span>
         </div>
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span className="text-xs text-gray-400 block">Verification</span>
-          <span className="text-base font-bold text-yellow-700 capitalize">{property.verificationStatus}</span>
-          <span className="text-[10px] text-yellow-600 block">Demo Record (Not Official)</span>
+          <span className="text-xs text-gray-400 block">{t('compare.verificationStatus')}</span>
+          <span className="text-base font-bold text-amber-700 capitalize">{t('common.demoUnverified')}</span>
+          <span className="text-[10px] text-amber-600 block">{t('propertyDetails.fictionalDemoId')}</span>
         </div>
       </div>
 
       {/* Official Government Verification Gateway */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs space-y-2">
         <h3 className="font-bold text-amber-900 text-sm flex items-center gap-1.5">
-          <span>🏛️</span> Official Maharashtra Record Verification
+          <span>🏛️</span> {t('propertyDetails.officialVerificationTitle')}
         </h3>
         <p className="text-amber-800">
-          This demo entry ({property.surveyNumber}) is for demonstration purposes. To view genuine official 7/12 (सातबारा), 8A khate-utara, or cadastral boundaries in {property.taluka}, visit the Maharashtra Revenue Department portals:
+          {t('propertyDetails.officialVerificationDesc', { survey: property.surveyNumber, taluka: localizeTaluka(property.taluka) })}
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <a
@@ -155,7 +170,7 @@ export default function PropertyDetails() {
             rel="noopener noreferrer"
             className="px-3 py-1.5 bg-amber-800 text-white rounded font-medium hover:bg-amber-900"
           >
-            Search Official Mahabhulekh Portal →
+            {t('propertyDetails.searchMahabhulekh')}
           </a>
           <a
             href="https://mahabhunakasha.mahabhumi.gov.in/"
@@ -163,13 +178,13 @@ export default function PropertyDetails() {
             rel="noopener noreferrer"
             className="px-3 py-1.5 bg-white border border-amber-400 text-amber-900 rounded font-medium hover:bg-amber-100"
           >
-            Open Official Cadastral Map (भू-नकाशा) →
+            {t('propertyDetails.openCadastral')}
           </a>
           <button
             onClick={() => navigate('/records')}
-            className="px-3 py-1.5 bg-green-700 text-white rounded font-medium hover:bg-green-800"
+            className="px-3 py-1.5 bg-gradient-to-r from-[#E86A17] to-[#C54E12] text-white rounded font-medium hover:opacity-95"
           >
-            Upload 7/12 Document to Verify →
+            {t('propertyDetails.uploadSatbara')}
           </button>
         </div>
       </div>

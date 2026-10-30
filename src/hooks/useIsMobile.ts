@@ -17,23 +17,17 @@ export function useIsMobile(): boolean {
 
     const platform = Capacitor.getPlatform();
     const isNativeMobile = platform === 'android' || platform === 'ios';
-
-    // On native Android/iOS phones, if screen width in portrait is standard phone (< 768px CSS or max dimension indicates phone),
-    // or simply if on native mobile platform and not in a very wide landscape monitor:
-    const width = window.innerWidth || document.documentElement.clientWidth || 0;
-    const height = window.innerHeight || document.documentElement.clientHeight || 0;
-    const isPortrait = height >= width;
-
-    if (isNativeMobile && (isPortrait || width < 768)) {
+    if (isNativeMobile) {
       return true;
     }
 
     const ua = navigator.userAgent || '';
     const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-    if (isMobileUA && (isPortrait || width < 768)) {
+    if (isMobileUA) {
       return true;
     }
 
+    const width = window.innerWidth || document.documentElement.clientWidth || 0;
     return width < 768;
   });
 
@@ -41,22 +35,21 @@ export function useIsMobile(): boolean {
     const checkMobile = () => {
       const platform = Capacitor.getPlatform();
       const isNativeMobile = platform === 'android' || platform === 'ios';
-      const width = window.innerWidth || document.documentElement.clientWidth || 0;
-      const height = window.innerHeight || document.documentElement.clientHeight || 0;
-      const isPortrait = height >= width;
 
-      if (isNativeMobile && (isPortrait || width < 768)) {
+      // On native mobile app, layout is always mobile and must not flip when keyboard resizes window height/width
+      if (isNativeMobile) {
         setIsMobile(true);
         return;
       }
 
       const ua = navigator.userAgent || '';
       const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-      if (isMobileUA && (isPortrait || width < 768)) {
+      if (isMobileUA) {
         setIsMobile(true);
         return;
       }
 
+      const width = window.innerWidth || document.documentElement.clientWidth || 0;
       setIsMobile(width < 768);
     };
 

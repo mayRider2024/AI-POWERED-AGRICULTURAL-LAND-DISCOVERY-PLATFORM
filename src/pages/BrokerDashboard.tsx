@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocalization } from '../utils/localization';
 
 interface ListingSubmission {
   title: string;
@@ -17,6 +18,7 @@ interface ListingSubmission {
 }
 
 export default function BrokerDashboard() {
+  const { formatNumber, formatINRLocalized } = useLocalization();
   const [activeTab, setActiveTab] = useState<'listings' | 'submit' | 'enquiries'>('listings');
   const [submittedListings, setSubmittedListings] = useState<ListingSubmission[]>([
     {
@@ -169,7 +171,7 @@ export default function BrokerDashboard() {
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{l.village}, {l.taluka}, {l.district}</p>
                   <p className="text-xs font-semibold text-green-700 mt-0.5">
-                    {l.areaAcres} Acres · ₹{l.pricePerGuntha.toLocaleString()} / guntha
+                    {formatNumber(l.areaAcres)} Acres · {formatINRLocalized(l.pricePerGuntha)} / guntha
                   </p>
                 </div>
                 <div className="text-right text-xs">

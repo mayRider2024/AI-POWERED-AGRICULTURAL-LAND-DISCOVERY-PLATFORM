@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ThemeProvider } from '../context/ThemeContext';
 import BottomNav from './BottomNav';
 import Sidebar from './Sidebar';
+import GuestSaveModal from './GuestSaveModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 interface LayoutProps {
@@ -30,6 +31,8 @@ export default function Layout({ children }: LayoutProps) {
           </main>
         </div>
       )}
+      {/* Global Guest Login Prompt Modal on Bookmark Attempt */}
+      <GuestSaveModal />
     </ThemeProvider>
   );
 }

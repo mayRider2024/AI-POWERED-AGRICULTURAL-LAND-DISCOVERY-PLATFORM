@@ -1,30 +1,57 @@
 import { NavLink } from 'react-router-dom';
-
-const navItems = [
-  { to: '/explore', icon: '🗺', label: 'Explore' },
-  { to: '/saved', icon: '♥', label: 'Saved' },
-  { to: '/assistant', icon: '🤖', label: 'AI' },
-  { to: '/activity', icon: '📋', label: 'Activity' },
-  { to: '/profile', icon: '👤', label: 'Profile' },
-];
+import { Home, Compass, Bookmark, Sparkles, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function BottomNav() {
+  const { t } = useTranslation();
+
+  const navItems = [
+    { to: '/home', icon: Home, label: t('nav.home') },
+    { to: '/explore', icon: Compass, label: t('nav.explore') },
+    { to: '/saved', icon: Bookmark, label: t('nav.saved') },
+    { to: '/assistant', icon: Sparkles, label: t('nav.aiSearch') },
+    { to: '/profile', icon: User, label: t('nav.profile') },
+  ];
+
   return (
-    <nav className="bg-white border-t border-gray-200 flex justify-around items-center py-1.5 px-2 safe-area-bottom flex-shrink-0 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] select-none">
-      {navItems.map(({ to, icon, label }) => (
+    <nav className="bg-[#FFFDFB] border-t border-[#F2DCC4] flex justify-around items-center px-2 py-2 safe-area-bottom flex-shrink-0 z-40 shadow-[0_-2px_12px_rgba(232,106,23,0.06)] select-none">
+      {navItems.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
           to={to}
           className={({ isActive }) =>
-            `flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-lg no-underline transition-colors ${
-              isActive ? 'text-green-700 font-semibold' : 'text-gray-500 hover:text-gray-800'
+            `flex flex-col items-center justify-center flex-1 py-1 rounded-xl no-underline transition-all active:scale-95 ${
+              isActive
+                ? 'text-[#C54E12]'
+                : 'text-stone-400 hover:text-stone-700'
             }`
           }
         >
-          <span className="text-xl leading-none mb-1">{icon}</span>
-          <span className="text-[11px] leading-tight tracking-tight">{label}</span>
+          {({ isActive }) => (
+            <>
+              <div
+                className={`w-9 h-7 rounded-lg flex items-center justify-center mb-0.5 transition-all ${
+                  isActive ? 'bg-[#FFE8D1] text-[#E86A17]' : 'bg-transparent text-stone-400'
+                }`}
+              >
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.4 : 1.75}
+                  className={isActive ? 'text-[#E86A17]' : 'text-stone-400'}
+                />
+              </div>
+              <span
+                className={`text-[11px] tracking-tight leading-none ${
+                  isActive ? 'font-bold text-[#C54E12]' : 'font-medium text-stone-500'
+                }`}
+              >
+                {label}
+              </span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>
   );
 }
+
