@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, X, Hand } from 'lucide-react';
 
@@ -87,6 +87,13 @@ const TOUR_STEPS: TourStep[] = [
   },
 ];
 
+const GUIDE_POS_STORAGE_KEY = 'landlens_guide_button_pos';
+
+interface Position {
+  x: number;
+  y: number;
+}
+
 export default function GuideBot() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -94,6 +101,165 @@ export default function GuideBot() {
   const [isActive, setIsActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+
+  // Floating trigger button state
+  const [position, setPosition] = useState<Position>(() => {
+    try {
+      const saved = localStorage.getItem(GUIDE_POS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    // Default safe initial position: bottom-right above bottom navigation bar
+    const defaultX = typeof window !== 'undefined' ? Math.max(16, window.innerWidth - 68) : 300;
+    const defaultY = typeof window !== 'undefined' ? Math.max(80, window.innerHeight - 130) : 600;
+    return { x: defaultX, y: defaultY };
+  });
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  const buttonRef = useRef<HTMLDivElement | null>(null);
+  const dragStartRef = useRef<{
+    startX: number;
+    startY: number;
+    initialX: number;
+    initialY: number;
+    hasMoved: boolean;
+  } | null>(null);
+
+  // Keep button safely inside bounds
+  const clampPosition = (x: number, y: number, btnWidth = 52, btnHeight = 52): Position => {
+    const vpWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    const vpHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const vpOffsetTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+    const vpOffsetLeft = window.visualViewport ? window.visualViewport.offsetLeft : 0;
+
+    const minX = vpOffsetLeft + 12;
+    const maxX = vpOffsetLeft + Math.max(12, vpWidth - btnWidth - 12);
+    // On mobile, keep top clearance (safe area) and bottom clearance (above bottom nav ~72px)
+    const minY = vpOffsetTop + 16;
+    const bottomNavHeight = 76;
+    const maxY = vpOffsetTop + Math.max(minY, vpHeight - btnHeight - bottomNavHeight);
+
+    return {
+      x: Math.min(Math.max(x, minX), maxX),
+      y: Math.min(Math.max(y, minY), maxY),
+    };
+  };
+
+  // Adjust on screen resize or visualViewport changes (keyboard open/close)
+  useEffect(() => {
+    const handleViewportChange = () => {
+      const vv = window.visualViewport;
+      const screenH = window.innerHeight;
+      const curH = vv ? vv.height : screenH;
+
+      // Keyboard detection: visual viewport height drops significantly (>150px)
+      const keyboardActive = screenH - curH > 150;
+      setIsKeyboardOpen(keyboardActive);
+
+      setPosition((prev) => {
+        const clamped = clampPosition(prev.x, prev.y);
+        // If keyboard popped up and button would obstruct the bottom composer
+        if (keyboardActive && clamped.y > curH - 120) {
+          clamped.y = Math.max(20, curH - 130);
+        }
+        return clamped;
+      });
+    };
+
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('orientationchange', handleViewportChange);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+        window.visualViewport.removeEventListener('scroll', handleViewportChange);
+      }
+    };
+  }, []);
+
+  // Save valid position to localStorage
+  useEffect(() => {
+    if (!isDragging) {
+      try {
+        localStorage.setItem(GUIDE_POS_STORAGE_KEY, JSON.stringify(position));
+      } catch {
+        // ignore storage errors
+      }
+    }
+  }, [position, isDragging]);
+
+  // Pointer drag handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return; // primary button only
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initialX: position.x,
+      initialY: position.y,
+      hasMoved: false,
+    };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStartRef.current) return;
+    const dx = e.clientX - dragStartRef.current.startX;
+    const dy = e.clientY - dragStartRef.current.startY;
+
+    // Movement threshold of 6px to separate click/tap from drag
+    if (!dragStartRef.current.hasMoved && Math.hypot(dx, dy) > 6) {
+      dragStartRef.current.hasMoved = true;
+      setIsDragging(true);
+    }
+
+    if (dragStartRef.current.hasMoved) {
+      const nextX = dragStartRef.current.initialX + dx;
+      const nextY = dragStartRef.current.initialY + dy;
+      setPosition(clampPosition(nextX, nextY));
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStartRef.current) return;
+
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+
+    const wasDragging = dragStartRef.current.hasMoved;
+    dragStartRef.current = null;
+
+    if (wasDragging) {
+      setIsDragging(false);
+    } else {
+      // Clean tap/click: open guide
+      setIsActive(true);
+      setStepIndex(0);
+    }
+  };
+
+  const handlePointerCancel = () => {
+    dragStartRef.current = null;
+    setIsDragging(false);
+  };
 
   const currentStep = TOUR_STEPS[stepIndex] || TOUR_STEPS[0];
 
@@ -162,20 +328,49 @@ export default function GuideBot() {
   return (
     <>
       {/* ──────────────────────────────────────────────────
-          Floating Bot Trigger Button
+          Draggable Floating Bot Trigger Button
+          - Compact circular 48px touch target by default
+          - Supports smooth pointer dragging across entire viewport
+          - Persists coordinates in localStorage
+          - Prevents overlap with keyboard or bottom composer
       ────────────────────────────────────────────────── */}
       {!isActive && (
-        <button
-          onClick={() => {
-            setIsActive(true);
-            setStepIndex(0);
+        <div
+          ref={buttonRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
+          style={{
+            position: 'fixed',
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+            touchAction: 'none',
           }}
-          className="fixed bottom-20 right-4 z-50 px-3 py-2 rounded-full bg-gradient-to-r from-[#E86A17] to-[#C54E12] text-white shadow-xl hover:shadow-2xl active:scale-95 transition-all flex items-center gap-2 border-2 border-white"
-          title="Start Interactive Guided Tour"
+          className={`z-50 select-none cursor-grab active:cursor-grabbing transition-transform ${
+            isDragging ? 'scale-110 shadow-2xl opacity-90' : 'hover:scale-105 shadow-xl'
+          }`}
         >
-          <span className="text-base animate-bounce">🤖</span>
-          <span className="text-xs font-black tracking-tight">Interactive Guide</span>
-        </button>
+          <div
+            className={`flex items-center bg-gradient-to-r from-[#E86A17] to-[#C54E12] text-white border-2 border-white rounded-full transition-all duration-200 overflow-hidden ${
+              isExpanded && !isKeyboardOpen
+                ? 'px-3 py-2 gap-2 shadow-2xl'
+                : 'w-12 h-12 justify-center shadow-lg'
+            }`}
+            onMouseEnter={() => setIsExpanded(true)}
+            onMouseLeave={() => setIsExpanded(false)}
+            aria-label="Interactive Guide"
+            role="button"
+            tabIndex={0}
+          >
+            <span className="text-xl leading-none flex items-center justify-center">🤖</span>
+            {isExpanded && !isKeyboardOpen && (
+              <span className="text-xs font-black tracking-tight whitespace-nowrap pr-1 animate-in fade-in duration-150">
+                Interactive Guide
+              </span>
+            )}
+          </div>
+        </div>
       )}
 
       {/* ──────────────────────────────────────────────────

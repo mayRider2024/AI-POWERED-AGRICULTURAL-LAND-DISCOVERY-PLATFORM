@@ -88,7 +88,7 @@ function localSearch(query: string): Property[] {
     const areaAtLeast = qTrans.match(/(?:at least|minimum of|min|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
     const areaAbove = qTrans.match(/(?:above|more than|greater than|>|पेक्षा जास्त)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
     const areaUnder = qTrans.match(/(?:under|less than|below|<|पेक्षा कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
-    const areaExact = qTrans.match(/(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
+    const areaExact = qTrans.match(/(?:at least|minimum of|min|around|about|approximately)?\s*(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
 
     if (areaAtLeast) {
       minArea = parseFloat(areaAtLeast[1]);
@@ -988,7 +988,13 @@ export default function AIAssistant() {
       )}
 
       {/* Input */}
-      <div className="p-3 bg-white border-t border-gray-200 flex items-center gap-2 flex-shrink-0 z-10">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage();
+        }}
+        className="p-3 bg-white border-t border-gray-200 flex items-center gap-2 flex-shrink-0 z-10"
+      >
         <select
           value={voiceLang}
           onChange={(e) => setVoiceLang(e.target.value)}
@@ -1018,18 +1024,19 @@ export default function AIAssistant() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
+          enterKeyHint="send"
           placeholder={t('aiAssistant.inputPlaceholder')}
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white"
           disabled={loading}
         />
         <button
-          onClick={sendMessage}
+          type="submit"
           disabled={loading || !input.trim()}
-          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-sm font-medium hover:opacity-95 disabled:opacity-50 transition-colors whitespace-nowrap"
+          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-sm font-medium hover:opacity-95 disabled:opacity-50 transition-colors whitespace-nowrap active:scale-95"
         >
           {t('aiAssistant.send')}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
