@@ -284,3 +284,4 @@ describe('LandLens AI — Comprehensive AI Search Localization & Parser Tests', 
     });
   });
 });
+
