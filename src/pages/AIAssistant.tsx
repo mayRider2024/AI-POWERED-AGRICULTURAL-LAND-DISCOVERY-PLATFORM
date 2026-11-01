@@ -107,19 +107,34 @@ function localSearch(query: string): Property[] {
   // Price per guntha parsing
   let minPricePerGuntha: number | null = null;
   let maxPricePerGuntha: number | null = null;
-  const gunthaRange = qTrans.match(/(?:between\s+)?(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)?\s*(?:to|and|-)\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs)\s*(?:per|\/)\s*(?:guntha|गुंठा)/);
+  const gunthaUnit = '(?:gunthas?|guntha|guntas?|gunta|गुंठा|गुंठे)';
+  const lacUnit = '(?:lakhs?|lakh|lacs?|lac|लाख)';
+  const currPrefix = '(?:₹|rs\\.?|inr)?';
+
+  const gunthaRange = qTrans.match(
+    new RegExp(`(?:price\\s+range\\s+)?(?:between\\s+)?${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*${lacUnit}?\\s*(?:per|\\/|a)?\\s*${gunthaUnit}?\\s*(?:to|and|-|ते)\\s*${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*${lacUnit}\\s*(?:per|\\/|a)\\s*${gunthaUnit}`)
+  );
   if (gunthaRange) {
     const g1 = parseFloat(gunthaRange[1]);
     const g2 = parseFloat(gunthaRange[2]);
     minPricePerGuntha = g1 < 1000 ? g1 * 100_000 : g1;
     maxPricePerGuntha = g2 < 1000 ? g2 * 100_000 : g2;
+  } else {
+    const singleGuntha = qTrans.match(
+      new RegExp(`${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*(${lacUnit})?\\s*(?:per|\\/|a)\\s*${gunthaUnit}`)
+    );
+    if (singleGuntha) {
+      let amt = parseFloat(singleGuntha[1]);
+      if (singleGuntha[2] || amt < 1000) amt = amt * 100_000;
+      maxPricePerGuntha = amt;
+    }
   }
 
   // Total price parsing
   let maxTotalPrice: number | null = null;
   if (!maxPricePerGuntha) {
     const lakhMatch = qTrans.match(/(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)/);
-    if (lakhMatch && !qTrans.includes('per guntha') && !qTrans.includes('गुंठा')) {
+    if (lakhMatch && !qTrans.includes('guntha') && !qTrans.includes('gunta') && !qTrans.includes('गुंठा')) {
       maxTotalPrice = parseFloat(lakhMatch[1]) * 100_000;
     }
     if (maxTotalPrice === null) {
@@ -130,9 +145,9 @@ function localSearch(query: string): Property[] {
     }
   }
 
-  // Road distance parsing
+  // Road distance parsing (handles "no more than 100 meters from a road", "within 100m of a road", "100 meters from road", etc.)
   let maxRoadDistance: number | null = null;
-  const roadMatch = qTrans.match(/(?:within|under|near|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m|meters?|metres?|मीटर)\s*(?:of\s*(?:a\s*)?)?(?:road|highway|रस्ता)/);
+  const roadMatch = qTrans.match(/(?:no\s+more\s+than|within|under|less\s+than|up\s+to|near|at\s+most|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)\s*(?:from\s+(?:a\s*)?|of\s+(?:a\s*)?|अंतरावर)?\s*(?:a\s*)?(?:road|highway|रस्ता|रस्त्या)/);
   if (roadMatch) {
     maxRoadDistance = parseFloat(roadMatch[1]);
   }
@@ -195,7 +210,7 @@ function normalizeProperty(p: any): Property {
 export default function AIAssistant() {
   const { t, i18n } = useTranslation();
   const { user, getAccessToken } = useAuth();
-  const { localizeLocation, formatSmartPrice, formatNumber, formatINRLocalized } = useLocalization();
+  const { localizeLocation, formatNumber, formatINRLocalized, formatDigits } = useLocalization();
 
   const initialWelcomeMessage: Message = {
     role: 'assistant',
@@ -218,6 +233,13 @@ export default function AIAssistant() {
 
   // Messages in active conversation
   const [messages, setMessages] = useState<Message[]>([initialWelcomeMessage]);
+
+  // Selected property for 7/12 Mahabhulekh verification dialog
+  const [selected712Prop, setSelected712Prop] = useState<Property | null>(null);
+
+  // Selected mode: 'auto' | 'server' | 'local'
+  const [searchMode, setSearchMode] = useState<'auto' | 'server' | 'local'>('auto');
+  const [serverErrorPrompt, setServerErrorPrompt] = useState<{ query: string; errorMsg: string } | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -442,7 +464,9 @@ export default function AIAssistant() {
           content: m.text,
         }));
 
-      if (backendStatus === 'online') {
+      const useServer = searchMode === 'server' || (searchMode === 'auto' && backendStatus === 'online');
+
+      if (useServer) {
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (user) {
           try {
@@ -476,18 +500,18 @@ export default function AIAssistant() {
           unsupported = data.unsupported || [];
           source = 'gemini';
         } else {
-          throw new Error(`Backend returned ${resp.status}`);
+          throw new Error(`Server returned HTTP ${resp.status}`);
         }
       } else {
-        // Offline: use local keyword search on demo data
+        // Explicit Local Mode or Offline: execute local rule-based search on full 200-property dataset
         results = localSearch(query);
         responseText =
           results.length > 0
-            ? `Found ${results.length} demo properties matching "${query}".`
+            ? `Found ${results.length} demonstration properties matching "${query}".`
             : `Found 0 matching properties.`;
         explanation = results.length > 0
-          ? 'Matched from local demonstration dataset.'
-          : 'No demo properties matched all terms. Try relaxing constraints (e.g. "Farms under ₹40 lakh in Raigad").';
+          ? 'Matched deterministically from local demonstration dataset.'
+          : 'No demo properties matched all terms. Try relaxing constraints.';
         source = 'local';
       }
 
@@ -518,23 +542,38 @@ export default function AIAssistant() {
           return [...updated].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
         });
       }
-    } catch {
-      // Fallback to local demo search on network failure
-      const localResults = localSearch(query);
-      const fallbackText = `Backend connection error. Showing local demo results for "${query}".`;
-      const fallbackExp = 'Could not connect to live API server. Reverted to offline demo catalog.';
-      const fallbackMsg: Message = {
-        role: 'assistant',
-        text: fallbackText,
-        source: 'local',
-        explanation: fallbackExp,
-        results: localResults,
-      };
+    } catch (err: any) {
+      // Do not silently fallback: display understandable error and option to run local demo search
+      const errorMsg = err?.message || 'Network request failed';
+      setServerErrorPrompt({ query, errorMsg });
 
-      setMessages((prev) => [...prev, fallbackMsg]);
+      const failureAssistantMsg: Message = {
+        role: 'assistant',
+        text: `⚠️ Server mode encountered an issue: ${errorMsg}`,
+        source: 'gemini',
+        explanation: 'The backend request could not be completed. You can retry in Server mode or run using Local Demo Search.',
+      };
+      setMessages((prev) => [...prev, failureAssistantMsg]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExecuteLocalFallback = (fallbackQuery: string) => {
+    setServerErrorPrompt(null);
+    setLoading(true);
+    const localResults = localSearch(fallbackQuery);
+    const fallbackMsg: Message = {
+      role: 'assistant',
+      text: localResults.length > 0
+        ? `Found ${localResults.length} demonstration properties using Local Search for "${fallbackQuery}".`
+        : `Found 0 matching properties using Local Search.`,
+      source: 'local',
+      explanation: 'Matched deterministically from the local 200-property demonstration dataset.',
+      results: localResults,
+    };
+    setMessages((prev) => [...prev, fallbackMsg]);
+    setLoading(false);
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
@@ -568,17 +607,8 @@ export default function AIAssistant() {
             <h1 className="font-bold text-gray-800 text-sm sm:text-base leading-tight truncate">
               {t('nav.aiSearch')}
             </h1>
-            <p className="text-xs text-gray-500 leading-tight flex items-center gap-1.5 truncate">
-              <span>Backend:</span>
-              <span
-                className={`inline-flex items-center gap-1 font-medium ${
-                  backendStatus === 'online'
-                    ? 'text-emerald-600'
-                    : backendStatus === 'offline'
-                    ? 'text-amber-600'
-                    : 'text-gray-500'
-                }`}
-              >
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[11px] text-gray-500 flex items-center gap-1">
                 <span
                   className={`w-2 h-2 rounded-full ${
                     backendStatus === 'online'
@@ -588,13 +618,49 @@ export default function AIAssistant() {
                       : 'bg-gray-400'
                   }`}
                 />
-                {backendStatus === 'online'
-                  ? t('aiAssistant.backendOnline')
-                  : backendStatus === 'offline'
-                  ? t('aiAssistant.localMode')
-                  : t('aiAssistant.checking')}
+                {backendStatus === 'online' ? 'Server Active' : 'Server Offline'}
               </span>
-            </p>
+
+              {/* Mode Selector */}
+              <div className="flex items-center bg-gray-100 rounded-md p-0.5 border border-gray-200 text-[10px] font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSearchMode('auto')}
+                  className={`px-1.5 py-0.5 rounded transition-all ${
+                    searchMode === 'auto'
+                      ? 'bg-white text-emerald-800 shadow-2xs font-bold'
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                  title="Auto (Server when online, Local fallback)"
+                >
+                  Auto
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSearchMode('server')}
+                  className={`px-1.5 py-0.5 rounded transition-all ${
+                    searchMode === 'server'
+                      ? 'bg-emerald-700 text-white shadow-2xs font-bold'
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                  title="Force Server AI mode"
+                >
+                  Server
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSearchMode('local')}
+                  className={`px-1.5 py-0.5 rounded transition-all ${
+                    searchMode === 'local'
+                      ? 'bg-amber-600 text-white shadow-2xs font-bold'
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                  title="Force Local Demo mode"
+                >
+                  Local
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -892,40 +958,83 @@ export default function AIAssistant() {
                 )}
 
                 {msg.results && msg.results.length > 0 && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-3 space-y-2.5">
                     {msg.results.map((p) => (
-                      <div key={p.id} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100 text-left">
+                      <div key={p.id} className="bg-white rounded-xl p-3 border border-amber-200 shadow-sm text-left space-y-2">
                         <div className="flex justify-between items-start gap-1">
-                          <span className="font-medium text-xs text-gray-800">{p.surveyNumber}</span>
-                          <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium whitespace-nowrap">
-                            DEMO
+                          <div>
+                            <span className="font-bold text-xs text-gray-800">{p.surveyNumber}</span>
+                            <span className="ml-1.5 text-[10px] text-gray-500 font-normal">
+                              ({p.id})
+                            </span>
+                          </div>
+                          <span className="text-[10px] bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                            Synthetic Demo Property
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5">{localizeLocation(p.village, p.taluka, p.district)}</p>
-                        <p className="text-xs text-emerald-700 font-semibold mt-1">
-                          {formatINRLocalized(p.totalPrice)} · {formatNumber(p.areaAcres)} {t('common.acres')}
-                          <span className="text-[10px] text-gray-500 font-normal block">
-                            {formatSmartPrice(p.totalPrice)} · {formatINRLocalized(p.pricePerGuntha)} / {t('common.guntha')}
-                          </span>
-                        </p>
-                        <div className="flex flex-wrap gap-1.5 mt-2">
+
+                        <div className="text-xs text-gray-600">
+                          <p className="font-semibold text-gray-700">
+                            📍 {localizeLocation(p.village, p.taluka, p.district)}
+                          </p>
+                          <p className="text-[11px] text-gray-500 font-mono mt-0.5">
+                            Illustrative Coordinates: {p.coordinates[1].toFixed(4)}°N, {p.coordinates[0].toFixed(4)}°E
+                          </p>
+                        </div>
+
+                        <div className="bg-amber-50/60 rounded-lg p-2 border border-amber-100 text-xs space-y-1">
+                          <div className="flex flex-wrap items-baseline justify-between gap-1">
+                            <span className="text-gray-800 font-bold">
+                              📐 {formatNumber(p.areaAcres)} {t('common.acres')} ({formatNumber(p.areaAcres * 40)} {t('common.gunthas')})
+                            </span>
+                            <span className="text-emerald-700 font-extrabold text-sm">
+                              {formatINRLocalized(p.totalPrice)}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between text-[11px] text-gray-600">
+                            <span>
+                              Price/Guntha: <strong className="text-gray-800">{formatINRLocalized(p.pricePerGuntha)}</strong>
+                            </span>
+                            {p.roadDistanceMeters !== undefined && (
+                              <span className="text-orange-700 font-medium">
+                                🛣️ {formatDigits(p.roadDistanceMeters)}m from road
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Direct Action Buttons: View on Map, Verify 7/12, Details, Save */}
+                        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-gray-100">
                           <button
+                            type="button"
+                            onClick={() => navigate(`/explore?highlight=${p.id}`)}
+                            className="text-xs px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs transition-colors"
+                          >
+                            <span>🗺️</span> View on Map
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setSelected712Prop(p)}
+                            className="text-xs px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs transition-colors"
+                          >
+                            <span>📜</span> Verify 7/12
+                          </button>
+
+                          <button
+                            type="button"
                             onClick={() => navigate(`/property/${p.id}`)}
-                            className="text-xs px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded hover:opacity-95 font-medium"
+                            className="text-xs px-2 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                           >
                             {t('aiAssistant.details')}
                           </button>
+
                           <button
-                            onClick={() => navigate(`/intelligence?id=${p.id}`)}
-                            className="text-xs px-2.5 py-1 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded hover:bg-emerald-100 font-medium"
-                          >
-                            📊 {t('common.intelligenceReport')}
-                          </button>
-                          <button
+                            type="button"
                             onClick={() => toggleSave(p.id)}
-                            className="text-xs px-2.5 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-medium"
+                            className="text-xs px-2 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                           >
-                            {savedIds.includes(p.id) ? '♥ ' + t('common.saved') : '♡ ' + t('common.save')}
+                            {savedIds.includes(p.id) ? '♥ Saved' : '♡ Save'}
                           </button>
                         </div>
                       </div>
@@ -984,6 +1093,118 @@ export default function AIAssistant() {
           <button onClick={toggleListening} className="underline text-red-800 text-xs">
             {t('aiAssistant.stop')}
           </button>
+        </div>
+      )}
+
+      {/* Server Failure Fallback Banner */}
+      {serverErrorPrompt && (
+        <div className="p-3 bg-amber-50 border-t border-b border-amber-300 text-xs flex items-center justify-between gap-2 z-10">
+          <div className="text-amber-900 leading-snug">
+            <span className="font-bold">⚠️ Server query failed:</span> {serverErrorPrompt.errorMsg}.
+            <span className="block text-[11px] text-amber-800">Would you like to execute this query with Local Search?</span>
+          </div>
+          <div className="flex gap-1.5 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => handleExecuteLocalFallback(serverErrorPrompt.query)}
+              className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded shadow-2xs"
+            >
+              Run Local
+            </button>
+            <button
+              type="button"
+              onClick={() => setServerErrorPrompt(null)}
+              className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-[11px]"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 7/12 Mahabhulekh Verification Modal */}
+      {selected712Prop && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150 border-2 border-amber-500 relative">
+            <div className="flex items-start justify-between border-b border-gray-100 pb-3">
+              <div>
+                <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                  Land Record Verification Guidance
+                </span>
+                <h3 className="font-bold text-gray-900 text-base flex items-center gap-1.5 mt-0.5">
+                  <span>📜</span> 7/12 Extract Verification
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelected712Prop(null)}
+                className="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none p-1"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Official Disclaimer Banner */}
+            <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-[#C54E12]">
+                <span>⚠️</span> DEMO PROPERTY SUMMARY — NOT A GOVERNMENT 7/12 EXTRACT
+              </div>
+              <p className="leading-relaxed text-[11px] text-gray-700">
+                LandLens AI provides synthetic demonstration properties for platform discovery. The survey number{' '}
+                <strong>{selected712Prop.surveyNumber}</strong> and owner details are synthetic demonstration data and do not represent a verified government land record.
+              </p>
+            </div>
+
+            {/* Reference Parameters for Mahabhulekh Search */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200 text-xs space-y-1.5">
+              <p className="font-bold text-gray-700 text-[11px] uppercase tracking-wide">
+                Demo Reference Parameters:
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-gray-500 block text-[10px]">District:</span>
+                  <span className="font-semibold text-gray-800">{selected712Prop.district}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block text-[10px]">Taluka:</span>
+                  <span className="font-semibold text-gray-800">{selected712Prop.taluka}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block text-[10px]">Village:</span>
+                  <span className="font-semibold text-gray-800">{selected712Prop.village}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block text-[10px]">Demo Gat / Survey:</span>
+                  <span className="font-semibold text-amber-800">{selected712Prop.surveyNumber}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mahabhulekh Instructions & Link */}
+            <div className="text-xs text-gray-600 space-y-2">
+              <p className="leading-relaxed">
+                To inspect official land titles, tenure, and encumbrance records in Maharashtra, use the government Mahabhulekh portal with authentic revenue records:
+              </p>
+              <a
+                href="https://bhulekh.mahabhumi.gov.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+              >
+                <span>🔗</span> Open Official Mahabhulekh Portal
+              </a>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setSelected712Prop(null)}
+                className="px-4 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-lg font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

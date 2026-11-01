@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSaved } from '../context/SavedPropertiesContext';
 import { properties } from '../data/properties';
 import { DISTRICT_BOUNDARIES } from '../data/districtBoundaries';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLocalization } from '../utils/localization';
 
 // Tell MapLibre where to find its Web Worker.
@@ -19,6 +19,8 @@ export default function MapViewEnhanced() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightParam = searchParams.get('highlight');
   const { t } = useTranslation();
   const {
     localizeDistrict,
@@ -33,7 +35,7 @@ export default function MapViewEnhanced() {
   const [isLoading, setIsLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  const [selectedPropId, setSelectedPropId] = useState<string | null>(null);
+  const [selectedPropId, setSelectedPropId] = useState<string | null>(highlightParam);
 
   // Filters state
   const [filterDistrict, setFilterDistrict] = useState('');
@@ -136,17 +138,22 @@ export default function MapViewEnhanced() {
 
       // Add property markers
       filteredProperties.forEach((p) => {
+        const isHighlighted = p.id === (selectedPropId || highlightParam);
         const el = document.createElement('div');
         el.style.cssText = `
-          width: 28px; height: 28px;
-          background: ${p.district === 'Raigad' ? '#16a34a' : '#2563eb'};
-          border: 2px solid white;
+          width: ${isHighlighted ? '36px' : '28px'};
+          height: ${isHighlighted ? '36px' : '28px'};
+          background: ${isHighlighted ? '#ea580c' : p.district === 'Raigad' ? '#16a34a' : '#2563eb'};
+          border: ${isHighlighted ? '3px solid #ffedd5' : '2px solid white'};
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          box-shadow: ${isHighlighted ? '0 0 15px rgba(234, 88, 12, 0.8), 0 4px 10px rgba(0,0,0,0.4)' : '0 2px 6px rgba(0,0,0,0.3)'};
           display: flex; align-items: center; justify-content: center;
+          transition: transform 0.2s;
+          transform: ${isHighlighted ? 'scale(1.15)' : 'scale(1)'};
+          z-index: ${isHighlighted ? '50' : '1'};
         `;
-        el.innerHTML = '<span style="color:white;font-size:10px;font-weight:bold;">₹</span>';
+        el.innerHTML = `<span style="color:white;font-size:${isHighlighted ? '13px' : '10px'};font-weight:bold;">₹</span>`;
         el.title = `${p.surveyNumber} — ${p.district}`;
         el.addEventListener('click', () => setSelectedPropId(p.id));
 
@@ -154,6 +161,18 @@ export default function MapViewEnhanced() {
           .setLngLat(p.coordinates)
           .addTo(map);
       });
+
+      // If a property was requested to be highlighted from URL, pan and zoom to it
+      if (highlightParam) {
+        const targetProp = properties.find((p) => p.id === highlightParam);
+        if (targetProp) {
+          map.flyTo({
+            center: targetProp.coordinates,
+            zoom: 13,
+            duration: 1200,
+          });
+        }
+      }
     });
 
     map.on('error', (e: { error?: { message?: string } }) => {

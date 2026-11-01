@@ -22,14 +22,14 @@ export const properties: Property[] = [
     "taluka": "Vikramgad",
     "village": "Nandur",
     "areaAcres": 10,
-    "pricePerGuntha": 1250000,
-    "totalPrice": 500000000,
+    "pricePerGuntha": 1000000,
+    "totalPrice": 400000000,
     "coordinates": [
       73.1007,
       19.8021
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 80,
+    "roadDistanceMeters": 40,
     "roadType": "Paved State Highway",
     "isDemo": true
   },
@@ -47,7 +47,7 @@ export const properties: Property[] = [
       19.9824
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 90,
+    "roadDistanceMeters": 60,
     "roadType": "Major District Road (MDR)",
     "isDemo": true
   },
@@ -183,15 +183,15 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Nandur",
-    "areaAcres": 8,
-    "pricePerGuntha": 68000,
-    "totalPrice": 21760000,
+    "areaAcres": 10,
+    "pricePerGuntha": 1250000,
+    "totalPrice": 500000000,
     "coordinates": [
       73.1022,
       19.8015
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 500,
+    "roadDistanceMeters": 80,
     "roadType": "Paved Approach Road",
     "isDemo": true
   },
@@ -219,15 +219,15 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Vangaon",
-    "areaAcres": 7.5,
-    "pricePerGuntha": 93000,
-    "totalPrice": 27900000,
+    "areaAcres": 10,
+    "pricePerGuntha": 1400000,
+    "totalPrice": 560000000,
     "coordinates": [
       72.7719,
       19.8994
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 800,
+    "roadDistanceMeters": 90,
     "roadType": "Kaccha / Farm Track",
     "isDemo": true
   },
@@ -291,15 +291,15 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Borigaon",
-    "areaAcres": 2.5,
-    "pricePerGuntha": 45000,
-    "totalPrice": 4500000,
+    "areaAcres": 10,
+    "pricePerGuntha": 1500000,
+    "totalPrice": 600000000,
     "coordinates": [
       72.9016,
       20.1849
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 40,
+    "roadDistanceMeters": 100,
     "roadType": "Kaccha / Farm Track",
     "isDemo": true
   },
@@ -327,15 +327,15 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Vangaon",
-    "areaAcres": 3,
-    "pricePerGuntha": 49000,
-    "totalPrice": 5880000,
+    "areaAcres": 10,
+    "pricePerGuntha": 1200000,
+    "totalPrice": 480000000,
     "coordinates": [
       72.7715,
       19.8973
     ],
     "verificationStatus": "unverified",
-    "roadDistanceMeters": 500,
+    "roadDistanceMeters": 50,
     "roadType": "Paved State Highway",
     "isDemo": true
   },
@@ -3616,3 +3616,5 @@ export const properties: Property[] = [
     "isDemo": true
   }
 ];
+
+export default properties;
