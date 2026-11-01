@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { useTranslation } from 'react-i18next';
 import { useSaved } from '../context/SavedPropertiesContext';
 import { properties } from '../data/properties';
+import { DISTRICT_BOUNDARIES } from '../data/districtBoundaries';
 import { useNavigate } from 'react-router-dom';
 import { useLocalization } from '../utils/localization';
 
@@ -103,6 +104,35 @@ export default function MapViewEnhanced() {
       clearTimeout(timeout);
       setIsLoading(false);
       setMapError(null);
+
+      // Add District Boundaries GeoJSON Layer to clearly delineate Palghar & Raigad
+      map.addSource('district-boundaries', {
+        type: 'geojson',
+        data: DISTRICT_BOUNDARIES,
+      });
+
+      // Layer 1: Fill polygon for each district with transparent brand tint
+      map.addLayer({
+        id: 'district-fills',
+        type: 'fill',
+        source: 'district-boundaries',
+        paint: {
+          'fill-color': ['get', 'fillColor'],
+          'fill-opacity': 0.85,
+        },
+      });
+
+      // Layer 2: Prominent dashed borders clearly marking outer district limits
+      map.addLayer({
+        id: 'district-lines',
+        type: 'line',
+        source: 'district-boundaries',
+        paint: {
+          'line-color': ['get', 'borderColor'],
+          'line-width': 2.5,
+          'line-dasharray': [3, 2],
+        },
+      });
 
       // Add property markers
       filteredProperties.forEach((p) => {
@@ -419,8 +449,22 @@ export default function MapViewEnhanced() {
               </span>
             </div>
             <div className="mt-2 text-sm text-gray-600 space-y-1">
-              <p>{localizeLocation(selectedProperty.village, selectedProperty.taluka, selectedProperty.district)}</p>
-              <p>📐 {formatNumber(selectedProperty.areaAcres)} {t('common.acres')} ({formatNumber(selectedProperty.areaAcres * 40)} {t('common.gunthas')})</p>
+              {/* Verified Inland Location Address Banner */}
+              <div className="bg-amber-50/70 border border-amber-200/90 rounded-lg p-2 text-xs text-amber-900 space-y-0.5">
+                <div className="flex items-center gap-1 font-bold text-[#C54E12]">
+                  <span>📍 Verified Local Area:</span>
+                </div>
+                <p className="font-semibold text-gray-800">
+                  Village {selectedProperty.village}, Taluka {selectedProperty.taluka}, District {selectedProperty.district}, Maharashtra
+                </p>
+                <p className="text-[11px] text-gray-500 font-mono">
+                  Coordinates: {selectedProperty.coordinates[1].toFixed(4)}°N, {selectedProperty.coordinates[0].toFixed(4)}°E
+                </p>
+              </div>
+
+              <p className="font-medium text-gray-700">
+                📐 {formatNumber(selectedProperty.areaAcres)} {t('common.acres')} ({formatNumber(selectedProperty.areaAcres * 40)} {t('common.gunthas')})
+              </p>
               <p className="text-emerald-700 font-bold">
                 {formatINRLocalized(selectedProperty.totalPrice)} <span className="text-xs text-gray-500 font-normal">{t('explore.asking')}</span>
                 <span className="block text-xs text-gray-500 font-normal">
