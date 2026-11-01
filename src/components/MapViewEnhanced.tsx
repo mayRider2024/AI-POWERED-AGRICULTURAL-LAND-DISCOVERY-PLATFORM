@@ -108,7 +108,7 @@ export default function MapViewEnhanced() {
       // Add District Boundaries GeoJSON Layer to clearly delineate Palghar & Raigad
       map.addSource('district-boundaries', {
         type: 'geojson',
-        data: DISTRICT_BOUNDARIES,
+        data: DISTRICT_BOUNDARIES as any,
       });
 
       // Layer 1: Fill polygon for each district with transparent brand tint
@@ -449,16 +449,16 @@ export default function MapViewEnhanced() {
               </span>
             </div>
             <div className="mt-2 text-sm text-gray-600 space-y-1">
-              {/* Verified Inland Location Address Banner */}
+              {/* Synthetic Listing Location & Illustrative Coordinates Banner */}
               <div className="bg-amber-50/70 border border-amber-200/90 rounded-lg p-2 text-xs text-amber-900 space-y-0.5">
                 <div className="flex items-center gap-1 font-bold text-[#C54E12]">
-                  <span>📍 Verified Local Area:</span>
+                  <span>🌾 Synthetic Property Listing</span>
                 </div>
                 <p className="font-semibold text-gray-800">
-                  Village {selectedProperty.village}, Taluka {selectedProperty.taluka}, District {selectedProperty.district}, Maharashtra
+                  Demo Village: {selectedProperty.village} · Taluka: {selectedProperty.taluka} · District: {selectedProperty.district}
                 </p>
                 <p className="text-[11px] text-gray-500 font-mono">
-                  Coordinates: {selectedProperty.coordinates[1].toFixed(4)}°N, {selectedProperty.coordinates[0].toFixed(4)}°E
+                  Illustrative Map Coordinates: {selectedProperty.coordinates[1].toFixed(4)}°N, {selectedProperty.coordinates[0].toFixed(4)}°E
                 </p>
               </div>
 

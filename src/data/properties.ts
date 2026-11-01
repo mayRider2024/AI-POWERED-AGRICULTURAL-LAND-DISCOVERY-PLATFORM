@@ -565,7 +565,7 @@ export const properties: Property[] = [
     "pricePerGuntha": 65000,
     "totalPrice": 26000000,
     "coordinates": [
-      72.9069,
+      72.9229,
       18.5812
     ],
     "verificationStatus": "unverified",
@@ -997,7 +997,7 @@ export const properties: Property[] = [
     "pricePerGuntha": 85000,
     "totalPrice": 8500000,
     "coordinates": [
-      72.8955,
+      72.9115,
       18.6071
     ],
     "verificationStatus": "unverified",
@@ -2545,7 +2545,7 @@ export const properties: Property[] = [
     "pricePerGuntha": 64000,
     "totalPrice": 25600000,
     "coordinates": [
-      72.8971,
+      72.9131,
       18.5875
     ],
     "verificationStatus": "unverified",
@@ -3553,7 +3553,7 @@ export const properties: Property[] = [
     "pricePerGuntha": 107000,
     "totalPrice": 34240000,
     "coordinates": [
-      72.8909,
+      72.9069,
       18.6094
     ],
     "verificationStatus": "unverified",
