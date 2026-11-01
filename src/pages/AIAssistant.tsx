@@ -70,6 +70,7 @@ function localSearch(query: string): Property[] {
   }
 
   // Area parsing (supports Marathi numbers: ५ एकर)
+  let exactArea: number | null = null;
   let minArea: number | null = null;
   let minAreaStrict = false;
   let maxArea: number | null = null;
@@ -80,15 +81,16 @@ function localSearch(query: string): Property[] {
     qTrans = qTrans.replaceAll(m, e);
   }
 
-  const areaRange = qTrans.match(/(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
+  const areaRange = qTrans.match(/(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
   if (areaRange) {
     minArea = parseFloat(areaRange[1]);
     maxArea = parseFloat(areaRange[2]);
   } else {
-    const areaAtLeast = qTrans.match(/(?:at least|minimum of|min|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
+    const areaAtLeast = qTrans.match(/(?:at least|minimum of|min|no less than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
     const areaAbove = qTrans.match(/(?:above|more than|greater than|>|पेक्षा जास्त)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
     const areaUnder = qTrans.match(/(?:under|less than|below|<|पेक्षा कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
-    const areaExact = qTrans.match(/(?:at least|minimum of|min|around|about|approximately)?\s*(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
+    const areaExplicitExact = qTrans.match(/(?:exact(?:ly)?\s+)(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
+    const areaStandardExact = qTrans.match(/(?:^|\s)(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
 
     if (areaAtLeast) {
       minArea = parseFloat(areaAtLeast[1]);
@@ -98,9 +100,11 @@ function localSearch(query: string): Property[] {
       minAreaStrict = true;
     } else if (areaUnder) {
       maxArea = parseFloat(areaUnder[1]);
-    } else if (areaExact) {
-      minArea = parseFloat(areaExact[1]);
-      minAreaStrict = false;
+    } else if (areaExplicitExact) {
+      exactArea = parseFloat(areaExplicitExact[1]);
+    } else if (areaStandardExact) {
+      // Natural speech like "10 acre agricultural land": treat as exact 10 acres
+      exactArea = parseFloat(areaStandardExact[1]);
     }
   }
 
@@ -156,6 +160,7 @@ function localSearch(query: string): Property[] {
     if (districtFilter && p.district !== districtFilter) return false;
     if (talukaFilter && p.taluka.toLowerCase() !== talukaFilter.toLowerCase()) return false;
     if (surveyFilter && !p.surveyNumber.toUpperCase().includes(surveyFilter)) return false;
+    if (exactArea !== null && p.areaAcres !== exactArea) return false;
     if (minArea !== null) {
       if (minAreaStrict && p.areaAcres <= minArea) return false;
       if (!minAreaStrict && p.areaAcres < minArea) return false;
@@ -167,7 +172,7 @@ function localSearch(query: string): Property[] {
     if (maxRoadDistance !== null && p.roadDistanceMeters && p.roadDistanceMeters > maxRoadDistance) return false;
 
     // Keyword match if no structured filters caught
-    if (!districtFilter && !talukaFilter && !surveyFilter && minArea === null && maxArea === null && maxTotalPrice === null && maxRoadDistance === null) {
+    if (!districtFilter && !talukaFilter && !surveyFilter && exactArea === null && minArea === null && maxArea === null && maxTotalPrice === null && maxRoadDistance === null) {
       return (
         p.district.toLowerCase().includes(q) ||
         p.taluka.toLowerCase().includes(q) ||
