@@ -10,6 +10,7 @@ import { startVoiceRecognition } from '../services/speech';
 import { useLocalization } from '../utils/localization';
 import { aiConversationService } from '../services/aiConversation';
 import { generateConversationTitle, type AIConversation } from '../types/aiConversation';
+import { executeLocalSearch } from '../utils/aiSearchParser';
 
 interface Message {
   id?: string;
@@ -20,170 +21,6 @@ interface Message {
   unmetConstraints?: string[];
   unsupported?: string[];
   results?: Property[];
-}
-
-function localSearch(query: string): Property[] {
-  const q = query.toLowerCase();
-
-  let districtFilter = '';
-  if (q.includes('raigad') || q.includes('रायगड')) districtFilter = 'Raigad';
-  else if (q.includes('palghar') || q.includes('पालघर')) districtFilter = 'Palghar';
-
-  let talukaFilter = '';
-  const talukasMap: Record<string, string> = {
-    panvel: 'Panvel',
-    पनवेल: 'Panvel',
-    alibag: 'Alibag',
-    alibaug: 'Alibag',
-    अलिबाग: 'Alibag',
-    pen: 'Pen',
-    पेण: 'Pen',
-    mhasala: 'Mhasala',
-    म्हसळा: 'Mhasala',
-    talasari: 'Talasari',
-    तलासरी: 'Talasari',
-    vikramgad: 'Vikramgad',
-    विक्रमगड: 'Vikramgad',
-    dahanu: 'Dahanu',
-    डहाणू: 'Dahanu',
-  };
-  for (const [key, name] of Object.entries(talukasMap)) {
-    if (q.includes(key)) {
-      talukaFilter = name;
-      if (['Panvel', 'Alibag', 'Pen', 'Mhasala'].includes(name) && !districtFilter) {
-        districtFilter = 'Raigad';
-      } else if (['Talasari', 'Vikramgad', 'Dahanu'].includes(name) && !districtFilter) {
-        districtFilter = 'Palghar';
-      }
-      break;
-    }
-  }
-
-  // Survey number parsing
-  let surveyFilter = '';
-  const surveyMatch = q.match(/(?:survey(?:\s*(?:no\.?|number))?|gat(?:\s*(?:no\.?|number))?|सर्व्हे|गट)\s*[:#-]?\s*([a-zA-Z0-9]+(?:\/[0-9]+)?)/i);
-  if (surveyMatch) {
-    surveyFilter = surveyMatch[1].toUpperCase();
-  } else {
-    const codeMatch = q.match(/\b([rp]-[0-9]{3})\b/i);
-    if (codeMatch) surveyFilter = codeMatch[1].toUpperCase();
-  }
-
-  // Area parsing (supports Marathi numbers: ५ एकर)
-  let exactArea: number | null = null;
-  let minArea: number | null = null;
-  let minAreaStrict = false;
-  let maxArea: number | null = null;
-
-  const marathiNums: Record<string, string> = { '०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9' };
-  let qTrans = q;
-  for (const [m, e] of Object.entries(marathiNums)) {
-    qTrans = qTrans.replaceAll(m, e);
-  }
-
-  const areaRange = qTrans.match(/(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)/);
-  if (areaRange) {
-    minArea = parseFloat(areaRange[1]);
-    maxArea = parseFloat(areaRange[2]);
-  } else {
-    const areaAtLeast = qTrans.match(/(?:at least|minimum of|min|no less than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
-    const areaAbove = qTrans.match(/(?:above|more than|greater than|>|पेक्षा जास्त)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
-    const areaUnder = qTrans.match(/(?:under|less than|below|<|पेक्षा कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*(?:acres?|acre|एकर)?/);
-    const areaExplicitExact = qTrans.match(/(?:exact(?:ly)?\s+)(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
-    const areaStandardExact = qTrans.match(/(?:^|\s)(\d+(?:\.\d+)?)\s*(?:-|\s+)?(?:acres?|acre|एकर)/);
-
-    if (areaAtLeast) {
-      minArea = parseFloat(areaAtLeast[1]);
-      minAreaStrict = false;
-    } else if (areaAbove) {
-      minArea = parseFloat(areaAbove[1]);
-      minAreaStrict = true;
-    } else if (areaUnder) {
-      maxArea = parseFloat(areaUnder[1]);
-    } else if (areaExplicitExact) {
-      exactArea = parseFloat(areaExplicitExact[1]);
-    } else if (areaStandardExact) {
-      // Natural speech like "10 acre agricultural land": treat as exact 10 acres
-      exactArea = parseFloat(areaStandardExact[1]);
-    }
-  }
-
-  // Price per guntha parsing
-  let minPricePerGuntha: number | null = null;
-  let maxPricePerGuntha: number | null = null;
-  const gunthaUnit = '(?:gunthas?|guntha|guntas?|gunta|गुंठा|गुंठे)';
-  const lacUnit = '(?:lakhs?|lakh|lacs?|lac|लाख)';
-  const currPrefix = '(?:₹|rs\\.?|inr)?';
-
-  const gunthaRange = qTrans.match(
-    new RegExp(`(?:price\\s+range\\s+)?(?:between\\s+)?${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*${lacUnit}?\\s*(?:per|\\/|a)?\\s*${gunthaUnit}?\\s*(?:to|and|-|ते)\\s*${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*${lacUnit}\\s*(?:per|\\/|a)\\s*${gunthaUnit}`)
-  );
-  if (gunthaRange) {
-    const g1 = parseFloat(gunthaRange[1]);
-    const g2 = parseFloat(gunthaRange[2]);
-    minPricePerGuntha = g1 < 1000 ? g1 * 100_000 : g1;
-    maxPricePerGuntha = g2 < 1000 ? g2 * 100_000 : g2;
-  } else {
-    const singleGuntha = qTrans.match(
-      new RegExp(`${currPrefix}\\s*(\\d+(?:\\.\\d+)?)\\s*(${lacUnit})?\\s*(?:per|\\/|a)\\s*${gunthaUnit}`)
-    );
-    if (singleGuntha) {
-      let amt = parseFloat(singleGuntha[1]);
-      if (singleGuntha[2] || amt < 1000) amt = amt * 100_000;
-      maxPricePerGuntha = amt;
-    }
-  }
-
-  // Total price parsing
-  let maxTotalPrice: number | null = null;
-  if (!maxPricePerGuntha) {
-    const lakhMatch = qTrans.match(/(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)/);
-    if (lakhMatch && !qTrans.includes('guntha') && !qTrans.includes('gunta') && !qTrans.includes('गुंठा')) {
-      maxTotalPrice = parseFloat(lakhMatch[1]) * 100_000;
-    }
-    if (maxTotalPrice === null) {
-      const directMatch = qTrans.match(/(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*(\d{5,10})/);
-      if (directMatch) {
-        maxTotalPrice = parseFloat(directMatch[1]);
-      }
-    }
-  }
-
-  // Road distance parsing (handles "no more than 100 meters from a road", "within 100m of a road", "100 meters from road", etc.)
-  let maxRoadDistance: number | null = null;
-  const roadMatch = qTrans.match(/(?:no\s+more\s+than|within|under|less\s+than|up\s+to|near|at\s+most|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)\s*(?:from\s+(?:a\s*)?|of\s+(?:a\s*)?|अंतरावर)?\s*(?:a\s*)?(?:road|highway|रस्ता|रस्त्या)/);
-  if (roadMatch) {
-    maxRoadDistance = parseFloat(roadMatch[1]);
-  }
-
-  return properties.filter((p) => {
-    if (districtFilter && p.district !== districtFilter) return false;
-    if (talukaFilter && p.taluka.toLowerCase() !== talukaFilter.toLowerCase()) return false;
-    if (surveyFilter && !p.surveyNumber.toUpperCase().includes(surveyFilter)) return false;
-    if (exactArea !== null && p.areaAcres !== exactArea) return false;
-    if (minArea !== null) {
-      if (minAreaStrict && p.areaAcres <= minArea) return false;
-      if (!minAreaStrict && p.areaAcres < minArea) return false;
-    }
-    if (maxArea !== null && p.areaAcres > maxArea) return false;
-    if (minPricePerGuntha !== null && p.pricePerGuntha < minPricePerGuntha) return false;
-    if (maxPricePerGuntha !== null && p.pricePerGuntha > maxPricePerGuntha) return false;
-    if (maxTotalPrice !== null && p.totalPrice > maxTotalPrice) return false;
-    if (maxRoadDistance !== null && p.roadDistanceMeters && p.roadDistanceMeters > maxRoadDistance) return false;
-
-    // Keyword match if no structured filters caught
-    if (!districtFilter && !talukaFilter && !surveyFilter && exactArea === null && minArea === null && maxArea === null && maxTotalPrice === null && maxRoadDistance === null) {
-      return (
-        p.district.toLowerCase().includes(q) ||
-        p.taluka.toLowerCase().includes(q) ||
-        p.village.toLowerCase().includes(q) ||
-        p.surveyNumber.toLowerCase().includes(q) ||
-        q.includes(p.district.toLowerCase()) ||
-        q.includes(p.taluka.toLowerCase())
-      );
-    }
-    return true;
-  });
 }
 
 function normalizeProperty(p: any): Property {
@@ -253,6 +90,21 @@ export default function AIAssistant() {
     if (i18n.language === 'hi') return 'hi-IN';
     return 'en-IN';
   });
+
+  const handleLanguageChange = (newVoiceLang: string) => {
+    setVoiceLang(newVoiceLang);
+    const langCode = newVoiceLang.startsWith('mr') ? 'mr' : newVoiceLang.startsWith('hi') ? 'hi' : 'en';
+    i18n.changeLanguage(langCode);
+    localStorage.setItem('i18nextLng', langCode);
+  };
+
+  useEffect(() => {
+    const lang = i18n.language || 'en';
+    if (lang.startsWith('mr') && voiceLang !== 'mr-IN') setVoiceLang('mr-IN');
+    else if (lang.startsWith('hi') && voiceLang !== 'hi-IN') setVoiceLang('hi-IN');
+    else if (lang.startsWith('en') && voiceLang !== 'en-IN') setVoiceLang('en-IN');
+  }, [i18n.language]);
+
   const voiceStopRef = useRef<(() => void) | null>(null);
   const [apiUrl, setApiUrlState] = useState<string>(() => getApiBaseUrl());
 
@@ -484,7 +336,7 @@ export default function AIAssistant() {
           }
         }
 
-        // Try backend AI search with conversation context
+        // Try backend AI search with conversation context and current language
         const resp = await fetch(`${apiUrl}/api/ai/search`, {
           method: 'POST',
           headers,
@@ -492,6 +344,7 @@ export default function AIAssistant() {
             query,
             conversation_id: currentConvId || undefined,
             history: historyPayload,
+            language: i18n.language,
           }),
           signal: AbortSignal.timeout(10000),
         });
@@ -499,8 +352,11 @@ export default function AIAssistant() {
           const data = await resp.json();
           const rawProps = data.properties ?? data.results ?? [];
           results = rawProps.map(normalizeProperty);
-          responseText = `Found ${results.length} matching ${results.length === 1 ? 'property' : 'properties'}.`;
-          explanation = data.explanation || '';
+          responseText =
+            results.length > 0
+              ? t('aiAssistant.matchingPropertiesFound', { count: results.length })
+              : t('aiAssistant.noPropertiesFound');
+          explanation = data.explanation || (results.length > 0 ? t('aiAssistant.geminiInterpreted') : t('aiAssistant.noPropertiesFound'));
           unmetConstraints = data.unmet_constraints || data.relaxation_hints || [];
           unsupported = data.unsupported || [];
           source = 'gemini';
@@ -508,15 +364,15 @@ export default function AIAssistant() {
           throw new Error(`Server returned HTTP ${resp.status}`);
         }
       } else {
-        // Explicit Local Mode or Offline: execute local rule-based search on full 200-property dataset
-        results = localSearch(query);
+        // Explicit Local Mode or Offline: execute local deterministic search on full 200-property dataset
+        results = executeLocalSearch(query);
         responseText =
           results.length > 0
-            ? `Found ${results.length} demonstration properties matching "${query}".`
-            : `Found 0 matching properties.`;
+            ? t('aiAssistant.matchingPropertiesFound', { count: results.length })
+            : t('aiAssistant.noPropertiesFound');
         explanation = results.length > 0
-          ? 'Matched deterministically from local demonstration dataset.'
-          : 'No demo properties matched all terms. Try relaxing constraints.';
+          ? t('aiAssistant.localMatched')
+          : t('aiAssistant.localNoMatch');
         source = 'local';
       }
 
@@ -554,9 +410,9 @@ export default function AIAssistant() {
 
       const failureAssistantMsg: Message = {
         role: 'assistant',
-        text: `⚠️ Server mode encountered an issue: ${errorMsg}`,
+        text: `⚠️ ${t('aiAssistant.serverQueryFailed')}: ${errorMsg}`,
         source: 'gemini',
-        explanation: 'The backend request could not be completed. You can retry in Server mode or run using Local Demo Search.',
+        explanation: t('aiAssistant.serverFallbackQuestion'),
       };
       setMessages((prev) => [...prev, failureAssistantMsg]);
     } finally {
@@ -567,14 +423,14 @@ export default function AIAssistant() {
   const handleExecuteLocalFallback = (fallbackQuery: string) => {
     setServerErrorPrompt(null);
     setLoading(true);
-    const localResults = localSearch(fallbackQuery);
+    const localResults = executeLocalSearch(fallbackQuery);
     const fallbackMsg: Message = {
       role: 'assistant',
       text: localResults.length > 0
-        ? `Found ${localResults.length} demonstration properties using Local Search for "${fallbackQuery}".`
-        : `Found 0 matching properties using Local Search.`,
+        ? t('aiAssistant.matchingPropertiesFound', { count: localResults.length })
+        : t('aiAssistant.noPropertiesFound'),
       source: 'local',
-      explanation: 'Matched deterministically from the local 200-property demonstration dataset.',
+      explanation: t('aiAssistant.localMatched'),
       results: localResults,
     };
     setMessages((prev) => [...prev, fallbackMsg]);
@@ -610,7 +466,7 @@ export default function AIAssistant() {
           <span className="text-2xl">🤖</span>
           <div className="min-w-0">
             <h1 className="font-bold text-gray-800 text-sm sm:text-base leading-tight truncate">
-              {t('nav.aiSearch')}
+              {t('aiAssistant.title')}
             </h1>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-[11px] text-gray-500 flex items-center gap-1">
@@ -623,7 +479,7 @@ export default function AIAssistant() {
                       : 'bg-gray-400'
                   }`}
                 />
-                {backendStatus === 'online' ? 'Server Active' : 'Server Offline'}
+                {backendStatus === 'online' ? t('aiAssistant.serverStatusOnline') : t('aiAssistant.serverStatusOffline')}
               </span>
 
               {/* Mode Selector */}
@@ -636,9 +492,9 @@ export default function AIAssistant() {
                       ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                       : 'text-gray-500 hover:text-gray-800'
                   }`}
-                  title="Auto (Server when online, Local fallback)"
+                  title={t('aiAssistant.modeAuto')}
                 >
-                  Auto
+                  {t('aiAssistant.modeAuto')}
                 </button>
                 <button
                   type="button"
@@ -648,9 +504,9 @@ export default function AIAssistant() {
                       ? 'bg-emerald-700 text-white shadow-2xs font-bold'
                       : 'text-gray-500 hover:text-gray-800'
                   }`}
-                  title="Force Server AI mode"
+                  title={t('aiAssistant.modeServer')}
                 >
-                  Server
+                  {t('aiAssistant.modeServer')}
                 </button>
                 <button
                   type="button"
@@ -660,9 +516,9 @@ export default function AIAssistant() {
                       ? 'bg-amber-600 text-white shadow-2xs font-bold'
                       : 'text-gray-500 hover:text-gray-800'
                   }`}
-                  title="Force Local Demo mode"
+                  title={t('aiAssistant.modeLocal')}
                 >
-                  Local
+                  {t('aiAssistant.modeLocal')}
                 </button>
               </div>
             </div>
@@ -689,7 +545,7 @@ export default function AIAssistant() {
             className="text-xs px-2.5 py-1.5 rounded border border-gray-300 hover:bg-gray-100 text-gray-600 flex items-center gap-1 font-medium whitespace-nowrap"
             title="Configure API Server IP / URL"
           >
-            ⚙ Server
+            ⚙ {t('aiAssistant.serverConfig')}
           </button>
         </div>
       </div>
@@ -926,20 +782,26 @@ export default function AIAssistant() {
                   <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
                     {msg.source === 'gemini' || (i === 0 && backendStatus === 'online') ? (
                       <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                        ✨ AI-Powered Land Search
+                        ✨ {t('aiAssistant.aiPoweredSearch')}
                       </span>
                     ) : (
                       <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                        ⚡ Local Demo Search
+                        ⚡ {t('aiAssistant.localDemoSearch')}
                       </span>
                     )}
                     {backendStatus === 'online' && (
-                      <span className="text-[9px] text-gray-400">Live Backend</span>
+                      <span className="text-[9px] text-gray-400">{t('aiAssistant.serverStatusOnline')}</span>
                     )}
                   </div>
                 )}
 
-                <p className="text-sm font-medium whitespace-pre-wrap">{msg.text}</p>
+                <p className="text-sm font-medium whitespace-pre-wrap">
+                  {msg.results
+                    ? msg.results.length > 0
+                      ? t('aiAssistant.matchingPropertiesFound', { count: msg.results.length })
+                      : t('aiAssistant.noPropertiesFound')
+                    : msg.text}
+                </p>
 
                 {msg.explanation && (
                   <div className="mt-1.5 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg p-2.5 space-y-1">
@@ -974,7 +836,7 @@ export default function AIAssistant() {
                             </span>
                           </div>
                           <span className="text-[10px] bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
-                            Synthetic Demo Property
+                            {t('aiAssistant.syntheticDemoProperty')}
                           </span>
                         </div>
 
@@ -983,7 +845,7 @@ export default function AIAssistant() {
                             📍 {localizeLocation(p.village, p.taluka, p.district)}
                           </p>
                           <p className="text-[11px] text-gray-500 font-mono mt-0.5">
-                            Illustrative Coordinates: {p.coordinates[1].toFixed(4)}°N, {p.coordinates[0].toFixed(4)}°E
+                            {t('aiAssistant.illustrativeCoordinates')}: {p.coordinates[1].toFixed(4)}°N, {p.coordinates[0].toFixed(4)}°E
                           </p>
                         </div>
 
@@ -998,11 +860,11 @@ export default function AIAssistant() {
                           </div>
                           <div className="flex flex-wrap items-center justify-between text-[11px] text-gray-600">
                             <span>
-                              Price/Guntha: <strong className="text-gray-800">{formatINRLocalized(p.pricePerGuntha)}</strong>
+                              {t('aiAssistant.pricePerGuntha')}: <strong className="text-gray-800">{formatINRLocalized(p.pricePerGuntha)}</strong>
                             </span>
                             {p.roadDistanceMeters !== undefined && (
                               <span className="text-orange-700 font-medium">
-                                🛣️ {formatDigits(p.roadDistanceMeters)}m from road
+                                🛣️ {t('aiAssistant.fromRoad', { distance: formatDigits(p.roadDistanceMeters) })}
                               </span>
                             )}
                           </div>
@@ -1015,7 +877,7 @@ export default function AIAssistant() {
                             onClick={() => navigate(`/explore?highlight=${p.id}`)}
                             className="text-xs px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs transition-colors"
                           >
-                            <span>🗺️</span> View on Map
+                            <span>🗺️</span> {t('aiAssistant.viewOnMap')}
                           </button>
 
                           <button
@@ -1023,7 +885,7 @@ export default function AIAssistant() {
                             onClick={() => setSelected712Prop(p)}
                             className="text-xs px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold flex items-center gap-1 shadow-xs transition-colors"
                           >
-                            <span>📜</span> Verify 7/12
+                            <span>📜</span> {t('aiAssistant.verify712')}
                           </button>
 
                           <button
@@ -1031,7 +893,7 @@ export default function AIAssistant() {
                             onClick={() => navigate(`/property/${p.id}`)}
                             className="text-xs px-2 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                           >
-                            {t('aiAssistant.details')}
+                            {t('aiAssistant.viewDetails')}
                           </button>
 
                           <button
@@ -1039,7 +901,7 @@ export default function AIAssistant() {
                             onClick={() => toggleSave(p.id)}
                             className="text-xs px-2 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                           >
-                            {savedIds.includes(p.id) ? '♥ Saved' : '♡ Save'}
+                            {savedIds.includes(p.id) ? `♥ ${t('aiAssistant.saved')}` : `♡ ${t('aiAssistant.save')}`}
                           </button>
                         </div>
                       </div>
@@ -1067,12 +929,12 @@ export default function AIAssistant() {
       {/* Suggestions with official prompts */}
       <div className="px-3 sm:px-4 py-2 bg-gray-50 border-t border-gray-200 flex gap-2 overflow-x-auto flex-shrink-0 no-scrollbar">
         {[
-          'Find agricultural land in Panvel under ₹40 lakh',
-          'Show land near highways in Raigad',
-          'Compare properties in Palghar',
-          'Find plots between 2 and 5 acres',
-          'Explain the 7/12 land record verification process',
-          'मला पालघरमध्ये ५ एकर शेतीची जमीन दाखवा',
+          t('aiAssistant.suggestedQuery1'),
+          t('aiAssistant.suggestedQuery2'),
+          t('aiAssistant.suggestedQuery3'),
+          t('aiAssistant.suggestedQuery4'),
+          t('aiAssistant.suggestedQuery5'),
+          t('aiAssistant.suggestedQuery6'),
         ].map((s) => (
           <button
             key={s}
@@ -1105,8 +967,8 @@ export default function AIAssistant() {
       {serverErrorPrompt && (
         <div className="p-3 bg-amber-50 border-t border-b border-amber-300 text-xs flex items-center justify-between gap-2 z-10">
           <div className="text-amber-900 leading-snug">
-            <span className="font-bold">⚠️ Server query failed:</span> {serverErrorPrompt.errorMsg}.
-            <span className="block text-[11px] text-amber-800">Would you like to execute this query with Local Search?</span>
+            <span className="font-bold">⚠️ {t('aiAssistant.serverQueryFailed')}:</span> {serverErrorPrompt.errorMsg}.
+            <span className="block text-[11px] text-amber-800">{t('aiAssistant.serverFallbackQuestion')}</span>
           </div>
           <div className="flex gap-1.5 flex-shrink-0">
             <button
@@ -1114,14 +976,14 @@ export default function AIAssistant() {
               onClick={() => handleExecuteLocalFallback(serverErrorPrompt.query)}
               className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded shadow-2xs"
             >
-              Run Local
+              {t('aiAssistant.runLocal')}
             </button>
             <button
               type="button"
               onClick={() => setServerErrorPrompt(null)}
               className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-[11px]"
             >
-              Dismiss
+              {t('aiAssistant.dismiss')}
             </button>
           </div>
         </div>
@@ -1134,10 +996,10 @@ export default function AIAssistant() {
             <div className="flex items-start justify-between border-b border-gray-100 pb-3">
               <div>
                 <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-                  Land Record Verification Guidance
+                  {t('aiAssistant.guidanceTitle')}
                 </span>
                 <h3 className="font-bold text-gray-900 text-base flex items-center gap-1.5 mt-0.5">
-                  <span>📜</span> 7/12 Extract Verification
+                  <span>📜</span> {t('aiAssistant.guidanceSubtitle')}
                 </h3>
               </div>
               <button
@@ -1152,34 +1014,33 @@ export default function AIAssistant() {
             {/* Official Disclaimer Banner */}
             <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 text-xs text-amber-900 space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-[#C54E12]">
-                <span>⚠️</span> DEMO PROPERTY SUMMARY — NOT A GOVERNMENT 7/12 EXTRACT
+                <span>⚠️</span> {t('aiAssistant.disclaimerBanner')}
               </div>
               <p className="leading-relaxed text-[11px] text-gray-700">
-                LandLens AI provides synthetic demonstration properties for platform discovery. The survey number{' '}
-                <strong>{selected712Prop.surveyNumber}</strong> and owner details are synthetic demonstration data and do not represent a verified government land record.
+                {t('aiAssistant.disclaimerBody', { surveyNumber: selected712Prop.surveyNumber })}
               </p>
             </div>
 
             {/* Reference Parameters for Mahabhulekh Search */}
             <div className="bg-gray-50 rounded-xl p-3 border border-gray-200 text-xs space-y-1.5">
               <p className="font-bold text-gray-700 text-[11px] uppercase tracking-wide">
-                Demo Reference Parameters:
+                {t('aiAssistant.demoReferenceParams')}
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <span className="text-gray-500 block text-[10px]">District:</span>
+                  <span className="text-gray-500 block text-[10px]">{t('aiAssistant.districtLabel')}</span>
                   <span className="font-semibold text-gray-800">{selected712Prop.district}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-[10px]">Taluka:</span>
+                  <span className="text-gray-500 block text-[10px]">{t('aiAssistant.talukaLabel')}</span>
                   <span className="font-semibold text-gray-800">{selected712Prop.taluka}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-[10px]">Village:</span>
+                  <span className="text-gray-500 block text-[10px]">{t('aiAssistant.villageLabel')}</span>
                   <span className="font-semibold text-gray-800">{selected712Prop.village}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-[10px]">Demo Gat / Survey:</span>
+                  <span className="text-gray-500 block text-[10px]">{t('aiAssistant.demoGatSurveyLabel')}</span>
                   <span className="font-semibold text-amber-800">{selected712Prop.surveyNumber}</span>
                 </div>
               </div>
@@ -1188,7 +1049,7 @@ export default function AIAssistant() {
             {/* Mahabhulekh Instructions & Link */}
             <div className="text-xs text-gray-600 space-y-2">
               <p className="leading-relaxed">
-                To inspect official land titles, tenure, and encumbrance records in Maharashtra, use the government Mahabhulekh portal with authentic revenue records:
+                {t('aiAssistant.officialPortalPrompt')}
               </p>
               <a
                 href="https://bhulekh.mahabhumi.gov.in/"
@@ -1196,7 +1057,7 @@ export default function AIAssistant() {
                 rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
               >
-                <span>🔗</span> Open Official Mahabhulekh Portal
+                <span>🔗</span> {t('aiAssistant.openMahabhulekh')}
               </a>
             </div>
 
@@ -1206,7 +1067,7 @@ export default function AIAssistant() {
                 onClick={() => setSelected712Prop(null)}
                 className="px-4 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-lg font-medium"
               >
-                Close
+                {t('aiAssistant.close')}
               </button>
             </div>
           </div>
@@ -1223,7 +1084,7 @@ export default function AIAssistant() {
       >
         <select
           value={voiceLang}
-          onChange={(e) => setVoiceLang(e.target.value)}
+          onChange={(e) => handleLanguageChange(e.target.value)}
           className="border border-gray-300 rounded-lg px-2 py-2 text-xs bg-gray-50 text-gray-700 outline-none"
           title="Voice Language"
         >

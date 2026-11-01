@@ -12,6 +12,7 @@ class AISearchRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=500, description="Natural language land search query")
     conversation_id: Optional[str] = Field(None, description="Optional UUID of active conversation")
     history: Optional[List[ChatHistoryMessage]] = Field(default_factory=list, description="Prior conversation messages for context")
+    language: Optional[str] = Field("en", description="User preferred language code: en, mr, or hi")
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -52,6 +52,17 @@ async def ai_search(
             ).first()
 
             if conv:
+                lang = (request_payload.language or "en").strip().lower()[:2]
+                if response.matching_count > 0:
+                    if lang == "mr":
+                        saved_content = f"{response.matching_count} जुळणाऱ्या जमिनी सापडल्या."
+                    elif lang == "hi":
+                        saved_content = f"{response.matching_count} मेल खाने वाली ज़मीनें मिलीं."
+                    else:
+                        saved_content = f"Found {response.matching_count} matching properties."
+                else:
+                    saved_content = response.explanation
+
                 # Build metadata from trusted server results
                 assistant_metadata = {
                     "source": "gemini",
@@ -63,7 +74,7 @@ async def ai_search(
                 assistant_msg = AIMessageModel(
                     conversation_id=conv.id,
                     role="assistant",
-                    content=response.explanation or f"Found {response.matching_count} matching properties.",
+                    content=saved_content,
                     message_metadata=assistant_metadata,
                 )
                 db.add(assistant_msg)

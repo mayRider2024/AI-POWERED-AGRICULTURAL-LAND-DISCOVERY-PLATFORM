@@ -25,20 +25,20 @@ import re
 def _rule_based_interpret_query(query: str) -> InterpretedFilters:
     q = query.lower()
 
-    # Marathi digits transliteration at the very start so all regexes see standard Arabic numerals
-    marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
-    for m_digit, eng_digit in marathi_nums.items():
-        q = q.replace(m_digit, eng_digit)
+    # Marathi/Hindi Devanagari digits transliteration at the very start so all regexes see standard Arabic numerals
+    devanagari_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
+    for d_digit, eng_digit in devanagari_nums.items():
+        q = q.replace(d_digit, eng_digit)
     q_trans = q
 
-    # District detection (including Marathi/Hindi transliterations: रायगड, पालघर)
+    # District detection (including Marathi/Hindi transliterations: रायगड, रायगढ़, पालघर)
     district = None
-    if "raigad" in q or "रायगड" in q:
+    if "raigad" in q or "रायगड" in q or "रायगढ़" in q:
         district = "Raigad"
     elif "palghar" in q or "पालघर" in q:
         district = "Palghar"
 
-    # Taluka detection (including Panvel, Alibag, Pen, Mhasala, Talasari, Vikramgad, Dahanu and Marathi terms)
+    # Taluka detection (including Panvel, Alibag, Pen, Mhasala, Talasari, Vikramgad, Dahanu and Marathi/Hindi terms)
     taluka = None
     talukas_map = {
         "panvel": "Panvel",
@@ -46,16 +46,21 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         "alibag": "Alibag",
         "alibaug": "Alibag",
         "अलिबाग": "Alibag",
+        "अलीबाग": "Alibag",
         "pen": "Pen",
         "पेण": "Pen",
+        "पेन": "Pen",
         "mhasala": "Mhasala",
         "म्हसळा": "Mhasala",
+        "म्हासला": "Mhasala",
         "talasari": "Talasari",
         "तलासरी": "Talasari",
         "vikramgad": "Vikramgad",
         "विक्रमगड": "Vikramgad",
+        "विक्रमगढ़": "Vikramgad",
         "dahanu": "Dahanu",
         "डहाणू": "Dahanu",
+        "दहानू": "Dahanu",
     }
     for key, name in talukas_map.items():
         if key in q:
@@ -67,9 +72,9 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
                 district = "Palghar"
             break
 
-    # Survey / Gat number parsing (e.g. "survey number 125/2", "gat no 45", "survey 125", "r-001", "p-001")
+    # Survey / Gat number parsing (e.g. "survey number 125/2", "gat no 45", "survey 125", "r-001", "p-001", "खसरा 125")
     survey_number = None
-    survey_match = re.search(r'(?:survey(?:\s*(?:no\.?|number))?|gat(?:\s*(?:no\.?|number))?|सर्व्हे(?:\s*क्र\.?)?|गट(?:\s*क्र\.?)?)\s*[:#-]?\s*([a-zA-Z0-9]+(?:/[0-9]+)?)', q)
+    survey_match = re.search(r'(?:survey(?:\s*(?:no\.?|number))?|gat(?:\s*(?:no\.?|number))?|सर्व्हे(?:\s*क्र\.?)?|गट(?:\s*क्र\.?)?|सर्वे(?:\s*नंबर)?|खसरा(?:\s*नं\.?)?)\s*[:#-]?\s*([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*(?:/[0-9]+)?)', q)
     if survey_match:
         survey_number = survey_match.group(1).upper()
     else:
@@ -78,59 +83,53 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         if code_match:
             survey_number = code_match.group(1).upper()
 
-    # Road proximity parsing (English & Marathi: "within 100 metres of a road", "no more than 100 meters from a road", "रस्त्यापासून २०० मीटर")
+    # Road proximity parsing (English, Marathi & Hindi: "within 100 metres of a road", "रस्त्यापासून १०० मीटर", "सड़क से 100 मीटर")
     max_road_distance = None
     road_req = False
     road_match = re.search(
-        r'(?:no\s+more\s+than|within|under|less\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|कमी)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)\s*(?:from|of|अंतरावर|अंतरापर्यंत)?\s*(?:a\s*)?(?:road|highway|रस्ता|रस्त्या)',
+        r'(?:no\s+more\s+than|within|under|less\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|कमी|अधिक)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)\s*(?:from|of|अंतरावर|अंतरापर्यंत|दूरी|दूर)?\s*(?:a\s*)?(?:road|highway|रस्ता|रस्त्या|सड़क)',
         q
     )
     if not road_match:
-        # Check Marathi prefix form: "रस्त्यापासून २०० मीटर", "रस्त्यालगत ५० मीटर"
+        # Check prefix form: "रस्त्यापासून २०० मीटर", "रस्त्यालगत ५० मीटर", "सड़क से १०० मीटर"
         road_match = re.search(
-            r'(?:रस्त्यापासून|रस्त्यालगत|रस्त्यावरून|रस्ता)\s*(?:कमीत\s*कमी|जास्तीत\s*जास्त|सुमारे|आत|पर्यंत)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)',
+            r'(?:रस्त्यापासून|रस्त्यालगत|रस्त्यावरून|रस्ता|सड़क\s*से|सड़क)\s*(?:कमीत\s*कमी|जास्तीत\s*जास्त|सुमारे|आत|पर्यंत|अधिक)?\s*(\d+(?:\.\d+)?)\s*(?:m\b|meters?\b|metres?\b|मीटर)',
             q
         )
 
     if road_match:
         max_road_distance = float(road_match.group(1))
         road_req = True
-    elif "road" in q or "highway" in q or "रस्ता" in q or "रस्त्या" in q:
+    elif "road" in q or "highway" in q or "रस्ता" in q or "रस्त्या" in q or "सड़क" in q:
         road_req = True
 
-    # Area parsing (acres / एकर / gunthas / गुंठा)
+    # Area parsing (acres / एकर / एकड़ / gunthas / गुंठा)
     exact_area = None
     min_area = None
     min_area_strict = False
     max_area = None
     max_area_strict = False
 
-    # Marathi digits transliteration
-    marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
-    q_trans = q
-    for m_digit, eng_digit in marathi_nums.items():
-        q_trans = q_trans.replace(m_digit, eng_digit)
+    area_unit = r'(?:acres?|acre|एकर|एकड़)'
 
-    area_unit = r'(?:acres?|acre|एकर)'
-
-    # Check for area range (e.g. "5 to 10 acres", "between 5 and 10 acres", "५ ते १० एकर")
-    area_range = re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+    # Check for area range (e.g. "5 to 10 acres", "between 5 and 10 acres", "५ ते १० एकर", "5 से 10 एकड़")
+    area_range = re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते|से)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
     if area_range:
         min_area = float(area_range.group(1))
         max_area = float(area_range.group(2))
     else:
         # Unit MUST be explicitly present - never make unit optional to prevent capturing road distance or prices!
         area_at_least = (
-            re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
-            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक)', q_trans)
+            re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी|कम\s*से\s*कम)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
+            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक|या\s*अधिक|या\s*ज्यादा)', q_trans)
         )
-        area_above = re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_above = re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त|से\s*अधिक|से\s*ज्यादा)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
         area_under = (
-            re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
-            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी)', q_trans)
+            re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत|से\s*कम|तक)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
+            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी|या\s*कम)', q_trans)
         )
-        area_explicit_exact = re.search(rf'(?:exact(?:ly)?\s+)(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
-        area_standard_exact = re.search(rf'\b(\d+(?:\.\d+)?)\s*{area_unit}\b', q_trans)
+        area_explicit_exact = re.search(rf'(?:exact(?:ly)?|नक्की|अचूक|सटीक|ठीक)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_standard_exact = re.search(rf'(?:^|\s|[^\w\u0900-\u097F])(\d+(?:\.\d+)?)\s*[-]?\s*{area_unit}(?:$|\s|[.,;:!?।,])', q_trans)
 
         if area_at_least:
             min_area = float(area_at_least.group(1))
@@ -140,22 +139,32 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
             min_area_strict = True
         elif area_under:
             max_area = float(area_under.group(1))
-            max_area_strict = False if any(kw in area_under.group(0) for kw in ["up to", "at most", "maximum", "max", "no more than", "पर्यंत"]) else True
+            max_area_strict = False if any(kw in area_under.group(0) for kw in ["up to", "at most", "maximum", "max", "no more than", "पर्यंत", "तक"]) else True
         elif area_explicit_exact:
             exact_area = float(area_explicit_exact.group(1))
         elif area_standard_exact:
             exact_area = float(area_standard_exact.group(1))
 
-    # Price per guntha parsing (e.g. "between ₹10 lakh and ₹15 lakh per guntha", "Rs 10 lac per gunta to Rs 15 lac a gunta", "₹50000 per guntha")
+    # Price per guntha parsing (e.g. "between ₹10 lakh and ₹15 lakh per guntha", "१० ते १५ लाख प्रति गुंठा", "10 लाख से 15 लाख रुपये प्रति गुंठा")
     min_price_per_guntha = None
     max_price_per_guntha = None
     guntha_unit = r'(?:gunthas?|guntha|guntas?|gunta|गुंठा|गुंठे)'
     lac_unit = r'(?:lakhs?|lakh|lacs?|lac|लाख)'
-    curr_prefix = r'(?:₹|rs\.?|inr)?'
+    curr_prefix = r'(?:₹|rs\.?|inr|रुपये)?'
 
-    guntha_range = re.search(
-        rf'(?:price\s+range\s+)?(?:between\s+)?{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}?\s*(?:per|/|a)?\s*{guntha_unit}?\s*(?:to|and|-|ते)\s*{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}\s*(?:per|/|a)\s*{guntha_unit}',
-        q_trans
+    guntha_range = (
+        re.search(
+            rf'(?:price\s+range\s+)?(?:between\s+)?{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}?\s*(?:per|/|a)?\s*{guntha_unit}?\s*(?:to|and|-|ते|से)\s*{curr_prefix}\s*(\d+(?:\.\d+)?)\s*{lac_unit}\s*(?:रुपये\s*)?(?:per|/|a|प्रति)\s*{guntha_unit}',
+            q_trans
+        ) or
+        re.search(
+            rf'(?:प्रति\s*{guntha_unit}|{guntha_unit}\s*(?:प्रति|दर)?)\s*{curr_prefix}\s*(\d+(?:\.\d+)?)\s*(?:-|to|ते|से)\s*(\d+(?:\.\d+)?)\s*{lac_unit}',
+            q_trans
+        ) or
+        re.search(
+            rf'{curr_prefix}\s*(\d+(?:\.\d+)?)\s*(?:-|to|ते|से)\s*(\d+(?:\.\d+)?)\s*{lac_unit}\s*(?:प्रति|दर)?\s*{guntha_unit}',
+            q_trans
+        )
     )
     if guntha_range:
         g1 = float(guntha_range.group(1))
@@ -164,7 +173,7 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         max_price_per_guntha = g2 * 100_000 if g2 < 1000 else g2
     else:
         single_guntha_price = re.search(
-            rf'{curr_prefix}\s*(\d+(?:\.\d+)?)\s*({lac_unit})?\s*(?:per|/|a)\s*{guntha_unit}',
+            rf'{curr_prefix}\s*(\d+(?:\.\d+)?)\s*({lac_unit})?\s*(?:per|/|a|प्रति)\s*{guntha_unit}',
             q_trans
         )
         if single_guntha_price:
@@ -177,12 +186,12 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
     max_total_price = None
     min_total_price = None
     if not max_price_per_guntha:
-        lakh_under = re.search(r'(?:under|below|less than|up to|max|कमी|खाली)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)', q_trans)
+        lakh_under = re.search(r'(?:under|below|less than|up to|max|कमी|खाली|कम|तक)?\s*(?:₹|rs\.?|inr|रुपये)?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|लाख)', q_trans)
         if lakh_under and not ("per guntha" in q_trans or "per gunta" in q_trans or "a gunta" in q_trans or "a guntha" in q_trans or "गुंठा" in q_trans):
             max_total_price = float(lakh_under.group(1)) * 100_000
 
         if max_total_price is None:
-            direct_price_under = re.search(r'(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*(\d{5,10})', q_trans)
+            direct_price_under = re.search(r'(?:under|below|less than|up to|कम|तक)\s*(?:₹|rs\.?|inr|रुपये)?\s*(\d{5,10})', q_trans)
             if direct_price_under:
                 max_total_price = float(direct_price_under.group(1))
 
@@ -216,16 +225,16 @@ def _normalize_acreage_filters(filters: InterpretedFilters, query: str) -> Inter
     for m_digit, eng_digit in marathi_nums.items():
         q = q.replace(m_digit, eng_digit)
 
-    area_unit = r'(?:acres?|acre|एकर)'
-    has_range = bool(re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q))
+    area_unit = r'(?:acres?|acre|एकर|एकड़)'
+    has_range = bool(re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते|से)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q))
     has_explicit_min = bool(
-        re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
-        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक)', q) or
-        re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q)
+        re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी|कम\s*से\s*कम)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
+        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक|या\s*अधिक|या\s*ज्यादा)', q) or
+        re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त|से\s*अधिक|से\s*ज्यादा)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q)
     )
     has_explicit_max = bool(
-        re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
-        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी)', q)
+        re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत|से\s*कम|तक)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
+        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी|या\s*कम)', q)
     )
 
     # If both min and max are set and equal (or within floating point delta), treat as exact
@@ -405,16 +414,34 @@ def _diagnose_unmet_constraints(db: Session, filters: InterpretedFilters) -> Lis
     return unmet
 
 def perform_ai_search(request: AISearchRequest, db: Session) -> AISearchResponse:
+    lang = (getattr(request, "language", None) or "en").strip().lower()[:2]
     # Interpret natural language query with context awareness
     filters = _interpret_query(request.query, history=getattr(request, "history", None))
     # Query DB with filters
     properties = _apply_filters(db, filters)
 
     unmet_constraints = []
-    explanation = "Filters interpreted by Gemini AI."
-    if not properties:
+    if properties:
+        if lang == "mr":
+            explanation = "जेमिनी एआय द्वारे स्पष्ट केलेले निकष."
+        elif lang == "hi":
+            explanation = "जेमिनी एआई द्वारा व्याख्यायित फिल्टर."
+        else:
+            explanation = "Filters interpreted by Gemini AI."
+    else:
         unmet_constraints = _diagnose_unmet_constraints(db, filters)
-        explanation = f"No matching properties found. " + " ".join(unmet_constraints)
+        if lang == "mr":
+            explanation = "कोणतीही जमीन सापडली नाही. " + " ".join(unmet_constraints)
+        elif lang == "hi":
+            explanation = "कोई ज़मीन नहीं मिली. " + " ".join(unmet_constraints)
+        else:
+            explanation = f"No matching properties found. " + " ".join(unmet_constraints)
+
+    demo_notice = "Demo data – unverified. Fictional parcels are never represented as official government records."
+    if lang == "mr":
+        demo_notice = "प्रात्यक्षिक माहिती – असत्यापित. काल्पनिक जमिनी अधिकृत सरकारी नोंदी म्हणून दर्शविल्या जात नाहीत."
+    elif lang == "hi":
+        demo_notice = "डेमो डेटा – असत्यापित. काल्पनिक ज़मीनों को आधिकारिक सरकारी रिकॉर्ड के रूप में कभी प्रस्तुत नहीं किया जाता है."
 
     # Serialize results safely, handling geometry, multi-unit area, and provenance
     serialized = []
@@ -458,5 +485,5 @@ def perform_ai_search(request: AISearchRequest, db: Session) -> AISearchResponse
         explanation=explanation,
         unmet_constraints=unmet_constraints,
         unsupported=[],
-        demo_notice="Demo data – unverified. Fictional parcels are never represented as official government records.",
+        demo_notice=demo_notice,
     )
