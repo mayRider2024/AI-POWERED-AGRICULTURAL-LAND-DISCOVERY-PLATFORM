@@ -34,6 +34,8 @@ android/.gradle/
 android/build/
 *.apk
 *.aab
+*.jks
+FINAL_SUBMISSION/
 
 # Editor directories and files
 .vscode/*

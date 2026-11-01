@@ -100,7 +100,11 @@
     "noMatch": "निवडलेल्या फिल्टरनुसार जमीन उपलब्ध नाही.",
     "demoLocationNotice": "डेमो स्थान — कायदेशीर सर्व्हे सीमा नाही",
     "demoUnverifiedBadge": "डेमो / असत्यापित",
-    "asking": "मागणी"
+    "asking": "मागणी",
+    "searchPlaceholder": "गाव, तालुका, जिल्हा किंवा सर्व्हे क्र. शोधा...",
+    "clearSearch": "शोध साफ करा",
+    "activeSearch": "सक्रिय शोध",
+    "noPropertiesFoundFor": "\"{{query}}\" साठी कोणतीही जमीन सापडली नाही"
   },
   "propertyDetails": {
     "back": "← मागे",

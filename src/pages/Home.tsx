@@ -77,11 +77,12 @@ export default function Home() {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) {
+    const query = searchQuery.trim();
+    if (!query) {
       navigate('/explore');
       return;
     }
-    const lower = searchQuery.toLowerCase();
+    const lower = query.toLowerCase();
     if (
       lower.includes('show') ||
       lower.includes('find') ||
@@ -90,9 +91,9 @@ export default function Home() {
       lower.includes('under') ||
       lower.includes('between')
     ) {
-      navigate('/assistant', { state: { prefill: searchQuery } });
+      navigate('/assistant', { state: { prefill: query } });
     } else {
-      navigate('/explore');
+      navigate(`/explore?q=${encodeURIComponent(query)}`);
     }
   };
 
@@ -201,6 +202,7 @@ export default function Home() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('home.searchPlaceholder')}
+              enterKeyHint="search"
               className="w-full bg-transparent text-sm text-[#25211E] placeholder:text-stone-400 outline-none font-medium py-1"
             />
             {searchQuery && (

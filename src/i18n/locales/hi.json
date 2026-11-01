@@ -100,7 +100,11 @@
     "noMatch": "वर्तमान फ़िल्टर में कोई जमीन उपलब्ध नहीं है।",
     "demoLocationNotice": "डेमो स्थान — सत्यापित सीमा नहीं है",
     "demoUnverifiedBadge": "डेमो / असत्यापित",
-    "asking": "मांग"
+    "asking": "मांग",
+    "searchPlaceholder": "गांव, तालुका, जिला या सर्वे क्र. खोजें...",
+    "clearSearch": "खोज हटाएं",
+    "activeSearch": "सक्रिय खोज",
+    "noPropertiesFoundFor": "\"{{query}}\" के लिए कोई भूमि नहीं मिली"
   },
   "propertyDetails": {
     "back": "← वापस",

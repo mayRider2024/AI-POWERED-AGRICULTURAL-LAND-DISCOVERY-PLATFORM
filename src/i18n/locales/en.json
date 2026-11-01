@@ -100,7 +100,11 @@
     "noMatch": "No properties match the current filters.",
     "demoLocationNotice": "Demo location — not a verified parcel boundary",
     "demoUnverifiedBadge": "DEMO / UNVERIFIED",
-    "asking": "asking"
+    "asking": "asking",
+    "searchPlaceholder": "Search village, taluka, district, or survey ID...",
+    "clearSearch": "Clear search",
+    "activeSearch": "Active search",
+    "noPropertiesFoundFor": "No properties found for \"{{query}}\""
   },
   "propertyDetails": {
     "back": "← Back",
