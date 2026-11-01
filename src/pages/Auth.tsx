@@ -223,9 +223,11 @@ export default function Auth() {
       {/* Top Bar with Branding & Language Switcher */}
       <header className="safe-area-top px-5 pt-4 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E86A17] to-[#C54E12] flex items-center justify-center text-white font-black text-lg shadow-sm shadow-[#E86A17]/25">
-            L
-          </div>
+          <img
+            src="/logo.png"
+            alt="LandLens AI"
+            className="w-10 h-10 rounded-xl object-cover shadow-sm shadow-[#E86A17]/20 border border-[#E0C7AD]"
+          />
           <div>
             <span className="font-heading font-extrabold text-base tracking-tight text-[#25211E]">
               LandLens<span className="text-[#E86A17]">AI</span>

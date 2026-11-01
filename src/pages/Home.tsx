@@ -114,10 +114,12 @@ export default function Home() {
       <header className="sticky top-0 z-30 bg-gradient-to-r from-[#C54E12] via-[#E86A17] to-[#FF9A3C] text-white safe-area-top shadow-md">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {/* Custom Saffron Diamond Brand Symbol */}
-            <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center font-extrabold text-sm text-white shadow-inner tracking-tight">
-              <span>LL</span>
-            </div>
+            {/* Custom Brand Logo */}
+            <img
+              src="/logo.png"
+              alt="LandLens AI Logo"
+              className="w-9 h-9 rounded-xl object-cover shadow-sm border border-white/30"
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-heading font-extrabold text-base tracking-tight text-white leading-none">
@@ -189,6 +191,7 @@ export default function Home() {
 
           {/* Prominent High-Contrast Search Bar */}
           <form
+            id="home-search-bar"
             onSubmit={handleSearchSubmit}
             className="relative z-10 flex items-center bg-white rounded-xl border border-[#E0BC95] shadow-xs focus-within:border-[#E86A17] focus-within:ring-2 focus-within:ring-[#E86A17]/20 transition-all p-1.5 pl-3.5"
           >
@@ -219,6 +222,7 @@ export default function Home() {
 
           {/* Compact AI Discovery Shortcut with Marigold Accent */}
           <button
+            id="home-ai-shortcut"
             onClick={() => navigate('/assistant')}
             className="w-full bg-[#FFFDFB] hover:bg-white border border-[#EAC49D] rounded-xl px-3.5 py-2.5 flex items-center justify-between transition-all active:scale-[0.99] text-left shadow-2xs"
           >
@@ -259,9 +263,10 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div id="district-selector" className="grid grid-cols-2 gap-2.5">
             {/* Raigad Tile */}
             <div
+              id="district-tile-raigad"
               onClick={() => setSelectedDistrict(selectedDistrict === 'Raigad' ? 'All' : 'Raigad')}
               className={`p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
                 selectedDistrict === 'Raigad'
@@ -436,7 +441,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredProperties.map((p) => {
+              {filteredProperties.map((p, idx) => {
                 const isSaved = savedIds.includes(p.id);
                 const gunthas = p.areaAcres * 40;
                 const pricePerAcre = p.pricePerGuntha * 40;
@@ -444,6 +449,7 @@ export default function Home() {
                 return (
                   <article
                     key={p.id}
+                    id={idx === 0 ? "first-property-card" : undefined}
                     onClick={() => navigate(`/property/${p.id}`)}
                     className="bg-white rounded-2xl border border-[#EAD2B8] shadow-xs hover:border-[#E86A17] transition-all cursor-pointer overflow-hidden active:scale-[0.99]"
                   >

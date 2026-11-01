@@ -78,8 +78,8 @@ export default function MapViewEnhanced() {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: styleUrls[mapStyle],
-      center: [73.15, 18.9],
-      zoom: 8.5,
+      center: filterDistrict === 'Raigad' ? [73.15, 18.65] : filterDistrict === 'Palghar' ? [72.95, 19.45] : [73.0, 19.0],
+      zoom: filterDistrict ? 9.6 : 8.2,
     });
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -192,6 +192,58 @@ export default function MapViewEnhanced() {
           <option value="positron">Positron (Clean)</option>
           <option value="bright">Bright (Vibrant)</option>
         </select>
+
+        {/* Quick District Focus Toggle */}
+        <div className="flex items-center gap-1 bg-stone-100 p-0.5 rounded-lg border border-stone-200">
+          <button
+            onClick={() => {
+              setFilterDistrict('');
+              if (mapRef.current) {
+                mapRef.current.flyTo({ center: [73.0, 19.0], zoom: 8.2, duration: 1000 });
+              }
+            }}
+            className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+              filterDistrict === ''
+                ? 'bg-white text-stone-800 shadow-xs'
+                : 'text-stone-500 hover:text-stone-800'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => {
+              setFilterDistrict('Raigad');
+              if (mapRef.current) {
+                mapRef.current.flyTo({ center: [73.15, 18.65], zoom: 9.6, duration: 1000 });
+              }
+            }}
+            className={`px-2 py-1 rounded text-xs font-bold flex items-center gap-1 transition-all ${
+              filterDistrict === 'Raigad'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-emerald-700 hover:bg-emerald-50'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 inline-block" />
+            Raigad
+          </button>
+          <button
+            onClick={() => {
+              setFilterDistrict('Palghar');
+              if (mapRef.current) {
+                mapRef.current.flyTo({ center: [72.95, 19.45], zoom: 9.6, duration: 1000 });
+              }
+            }}
+            className={`px-2 py-1 rounded text-xs font-bold flex items-center gap-1 transition-all ${
+              filterDistrict === 'Palghar'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-blue-700 hover:bg-blue-50'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-300 inline-block" />
+            Palghar
+          </button>
+        </div>
+
         <span className="ml-auto text-xs text-gray-500 whitespace-nowrap pl-1">{t('home.listingsCount', { count: formatDigits(filteredProperties.length) })}</span>
       </div>
 

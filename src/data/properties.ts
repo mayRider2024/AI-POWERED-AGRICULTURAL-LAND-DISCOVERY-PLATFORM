@@ -21,12 +21,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Nandur",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 1250000,
-    "totalPrice": 500000000.0,
+    "totalPrice": 500000000,
     "coordinates": [
-      73.1205,
-      19.3512
+      73.1007,
+      19.8021
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 80,
@@ -39,12 +39,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Kasa",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 1100000,
-    "totalPrice": 440000000.0,
+    "totalPrice": 440000000,
     "coordinates": [
-      72.9102,
-      19.412
+      72.9374,
+      19.9824
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 90,
@@ -59,10 +59,10 @@ export const properties: Property[] = [
     "village": "Apta",
     "areaAcres": 1.5,
     "pricePerGuntha": 55000,
-    "totalPrice": 3300000.0,
+    "totalPrice": 3300000,
     "coordinates": [
-      73.1142,
-      18.9912
+      73.1327,
+      18.8705
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 65,
@@ -79,8 +79,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 50000,
     "totalPrice": 5000000,
     "coordinates": [
-      73.15,
-      18.6
+      72.9314,
+      18.6659
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 45,
@@ -97,8 +97,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 52000,
     "totalPrice": 3744000,
     "coordinates": [
-      73.25,
-      18.78
+      73.099,
+      18.7418
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -111,12 +111,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 48000,
     "totalPrice": 5760000,
     "coordinates": [
-      73.05,
-      19.25
+      72.9178,
+      20.1286
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 80,
@@ -133,8 +133,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 47000,
     "totalPrice": 4136000,
     "coordinates": [
-      73.12,
-      19.35
+      73.102,
+      19.797
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 210,
@@ -151,8 +151,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 51000,
     "totalPrice": 2448000,
     "coordinates": [
-      73.33,
-      18.55
+      73.1274,
+      18.1222
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 60,
@@ -169,8 +169,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 46000,
     "totalPrice": 4968000,
     "coordinates": [
-      72.9,
-      19.4
+      72.8317,
+      20.0085
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -183,12 +183,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Nandur",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 68000,
     "totalPrice": 21760000,
     "coordinates": [
-      72.7115,
-      19.1977
+      73.1022,
+      19.8015
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -201,12 +201,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Wavanje",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 250000,
     "totalPrice": 40000000,
     "coordinates": [
-      73.1832,
-      18.453
+      73.1604,
+      19.0209
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -223,8 +223,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 93000,
     "totalPrice": 27900000,
     "coordinates": [
-      73.0036,
-      19.2543
+      72.7719,
+      19.8994
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -237,12 +237,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Dunkur",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 750000,
     "totalPrice": 300000000,
     "coordinates": [
-      72.9733,
-      18.5382
+      73.1106,
+      18.9167
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -255,12 +255,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Nandur",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1400000,
     "totalPrice": 224000000,
     "coordinates": [
-      72.8087,
-      19.3408
+      73.1013,
+      19.8027
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -277,8 +277,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 88000,
     "totalPrice": 5280000,
     "coordinates": [
-      73.0559,
-      18.3552
+      73.0973,
+      18.2226
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -295,8 +295,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 45000,
     "totalPrice": 4500000,
     "coordinates": [
-      73.1138,
-      19.5629
+      72.9016,
+      20.1849
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -313,8 +313,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 98000,
     "totalPrice": 5880000,
     "coordinates": [
-      73.0989,
-      18.745
+      72.872,
+      18.7982
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -327,12 +327,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Vangaon",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 49000,
     "totalPrice": 5880000,
     "coordinates": [
-      72.7527,
-      19.5264
+      72.7715,
+      19.8973
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -345,12 +345,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Awas",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 111000,
     "totalPrice": 17760000,
     "coordinates": [
-      73.0746,
-      18.4537
+      72.8819,
+      18.7602
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -363,12 +363,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Sakhare",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 500000,
     "totalPrice": 240000000,
     "coordinates": [
-      72.6897,
-      19.3808
+      73.1411,
+      19.8312
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -385,8 +385,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 98000,
     "totalPrice": 29400000,
     "coordinates": [
-      72.9638,
-      18.4
+      73.0677,
+      18.723
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -399,12 +399,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Pali",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 114000,
     "totalPrice": 36480000,
     "coordinates": [
-      72.7816,
-      19.3796
+      73.1839,
+      19.691
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -417,12 +417,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Kadam",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 250000,
     "totalPrice": 100000000,
     "coordinates": [
-      72.976,
-      18.407
+      73.1315,
+      18.1137
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -435,12 +435,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Kudus",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 99000,
     "totalPrice": 15840000,
     "coordinates": [
-      73.2326,
-      19.4704
+      73.1022,
+      19.6196
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -457,8 +457,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 74000,
     "totalPrice": 22200000,
     "coordinates": [
-      73.0841,
-      18.838
+      73.3179,
+      19.0282
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -475,8 +475,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 73000,
     "totalPrice": 3504000,
     "coordinates": [
-      73.1072,
-      19.7803
+      72.9397,
+      19.9913
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -489,12 +489,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Mangarul",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 117000,
     "totalPrice": 56160000,
     "coordinates": [
-      73.1043,
-      18.4392
+      73.3527,
+      18.8936
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -511,8 +511,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 42000,
     "totalPrice": 10416000,
     "coordinates": [
-      72.8678,
-      19.1783
+      73.1008,
+      19.6108
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -529,8 +529,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 50000,
     "totalPrice": 5000000,
     "coordinates": [
-      73.1716,
-      18.36
+      72.9231,
+      18.6721
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -543,12 +543,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 110000,
     "totalPrice": 8800000,
     "coordinates": [
-      72.9666,
-      19.2156
+      73.1518,
+      19.6462
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -561,12 +561,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Nagaon",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 65000,
     "totalPrice": 26000000,
     "coordinates": [
-      73.1194,
-      18.7991
+      72.9069,
+      18.5812
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -579,12 +579,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Sambha",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 55000,
     "totalPrice": 33000000,
     "coordinates": [
-      72.6884,
-      19.2735
+      72.942,
+      20.1577
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -601,8 +601,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 250000,
     "totalPrice": 62000000,
     "coordinates": [
-      72.9153,
-      18.7955
+      73.1525,
+      18.5326
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -615,12 +615,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 1200000,
     "totalPrice": 240000000,
     "coordinates": [
-      72.9735,
-      19.4398
+      72.931,
+      20.1278
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -637,8 +637,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 92000,
     "totalPrice": 9200000,
     "coordinates": [
-      72.9382,
-      18.4333
+      73.12,
+      18.4826
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -655,8 +655,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 46000,
     "totalPrice": 8832000,
     "coordinates": [
-      73.2405,
-      19.5714
+      72.7208,
+      19.7249
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -673,8 +673,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 53000,
     "totalPrice": 7420000,
     "coordinates": [
-      72.9941,
-      18.4741
+      73.169,
+      18.1274
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -687,12 +687,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Boisar",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 49000,
     "totalPrice": 5880000,
     "coordinates": [
-      73.1668,
-      19.4102
+      72.7612,
+      19.7962
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -705,12 +705,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Morbe",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 51000,
     "totalPrice": 10200000,
     "coordinates": [
-      73.3892,
-      18.9485
+      73.1903,
+      18.9188
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -727,8 +727,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 47000,
     "totalPrice": 4700000,
     "coordinates": [
-      72.6513,
-      19.2152
+      72.7118,
+      19.7337
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -741,12 +741,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Lep",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 111000,
     "totalPrice": 17760000,
     "coordinates": [
-      73.172,
-      18.7633
+      73.1732,
+      18.1759
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -763,8 +763,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 47000,
     "totalPrice": 11656000,
     "coordinates": [
-      72.6843,
-      19.6236
+      72.8204,
+      20.0216
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -777,12 +777,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Nivi",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 1000000,
     "totalPrice": 80000000,
     "coordinates": [
-      72.9915,
-      18.3561
+      73.1788,
+      18.4666
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -799,8 +799,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 112000,
     "totalPrice": 6720000,
     "coordinates": [
-      73.0067,
-      19.2724
+      72.9418,
+      19.9925
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -817,8 +817,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 80000,
     "totalPrice": 19840000,
     "coordinates": [
-      73.0026,
-      18.9543
+      73.1596,
+      18.132
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -831,12 +831,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Gholvad",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1200000,
     "totalPrice": 192000000,
     "coordinates": [
-      72.8397,
-      19.31
+      72.7334,
+      20.0413
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -853,8 +853,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 52000,
     "totalPrice": 12896000,
     "coordinates": [
-      73.0079,
-      18.3513
+      73.1302,
+      18.9373
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -867,12 +867,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 500000,
     "totalPrice": 300000000,
     "coordinates": [
-      73.1502,
-      19.2104
+      72.9303,
+      20.1373
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -889,8 +889,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 110000,
     "totalPrice": 5280000,
     "coordinates": [
-      73.278,
-      18.5096
+      73.1832,
+      18.4713
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -903,12 +903,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Nandur",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 74000,
     "totalPrice": 23680000,
     "coordinates": [
-      72.7764,
-      19.2972
+      73.0965,
+      19.7973
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -921,12 +921,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Mangarul",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 46000,
     "totalPrice": 9200000,
     "coordinates": [
-      73.1341,
-      18.3646
+      73.3386,
+      18.897
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -939,12 +939,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Malwada",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 500000,
     "totalPrice": 200000000,
     "coordinates": [
-      72.9151,
-      19.2131
+      73.1664,
+      19.7882
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -961,8 +961,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1200000,
     "totalPrice": 72000000,
     "coordinates": [
-      73.2074,
-      18.9328
+      73.3384,
+      18.425
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -975,12 +975,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 500000,
     "totalPrice": 80000000,
     "coordinates": [
-      73.2099,
-      19.3553
+      73.1606,
+      19.6455
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -997,8 +997,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 85000,
     "totalPrice": 8500000,
     "coordinates": [
-      73.4105,
-      18.8461
+      72.8955,
+      18.6071
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1011,12 +1011,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Bordi",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 1400000,
     "totalPrice": 672000000,
     "coordinates": [
-      73.1788,
-      19.6675
+      72.7518,
+      20.1056
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1029,12 +1029,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Mangarul",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 71000,
     "totalPrice": 28400000,
     "coordinates": [
-      73.3524,
-      18.4868
+      73.34,
+      18.8948
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -1051,8 +1051,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 750000,
     "totalPrice": 75000000,
     "coordinates": [
-      73.1423,
-      19.3448
+      73.0842,
+      19.7966
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -1069,8 +1069,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 75000,
     "totalPrice": 7500000,
     "coordinates": [
-      73.4601,
-      18.905
+      73.1942,
+      18.9224
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1087,8 +1087,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 108000,
     "totalPrice": 32400000,
     "coordinates": [
-      72.6666,
-      19.3318
+      73.2277,
+      19.6779
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1105,8 +1105,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 750000,
     "totalPrice": 36000000,
     "coordinates": [
-      73.3519,
-      18.542
+      73.1398,
+      18.4429
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1119,12 +1119,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Kudus",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 64000,
     "totalPrice": 10240000,
     "coordinates": [
-      73.0753,
-      19.2783
+      73.1041,
+      19.6207
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1141,8 +1141,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 82000,
     "totalPrice": 11480000,
     "coordinates": [
-      73.278,
-      18.7362
+      73.1484,
+      18.5395
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -1155,12 +1155,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Borigaon",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 81000,
     "totalPrice": 9720000,
     "coordinates": [
-      72.8274,
-      19.3817
+      72.912,
+      20.1813
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -1173,12 +1173,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Kole",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 62000,
     "totalPrice": 9920000,
     "coordinates": [
-      73.0606,
-      18.7309
+      73.1586,
+      18.1291
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -1191,12 +1191,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Malwada",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 1400000,
     "totalPrice": 168000000,
     "coordinates": [
-      73.0428,
-      19.506
+      73.1718,
+      19.78
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1213,8 +1213,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 61000,
     "totalPrice": 6100000,
     "coordinates": [
-      73.0503,
-      18.7612
+      73.1587,
+      18.1429
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -1231,8 +1231,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 70000,
     "totalPrice": 4200000,
     "coordinates": [
-      72.7848,
-      19.571
+      73.185,
+      19.6775
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -1249,8 +1249,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 118000,
     "totalPrice": 11800000,
     "coordinates": [
-      72.9237,
-      18.8948
+      73.1281,
+      18.8824
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1263,12 +1263,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 103000,
     "totalPrice": 32960000,
     "coordinates": [
-      72.7385,
-      19.3798
+      73.1605,
+      19.6391
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -1281,12 +1281,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Dunkur",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1400000,
     "totalPrice": 224000000,
     "coordinates": [
-      73.1908,
-      18.9706
+      73.1078,
+      18.9174
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1303,8 +1303,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 750000,
     "totalPrice": 144000000,
     "coordinates": [
-      73.2427,
-      19.5673
+      72.8275,
+      20.0199
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -1317,12 +1317,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Mendadi",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 104000,
     "totalPrice": 49920000,
     "coordinates": [
-      73.4241,
-      18.5987
+      73.0886,
+      18.2097
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1335,12 +1335,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Satpati",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 75000,
     "totalPrice": 9000000,
     "coordinates": [
-      72.9628,
-      19.6361
+      72.7134,
+      19.7336
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -1357,8 +1357,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 70000,
     "totalPrice": 4200000,
     "coordinates": [
-      73.0718,
-      18.4902
+      73.1405,
+      18.7183
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -1375,8 +1375,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 59000,
     "totalPrice": 5900000,
     "coordinates": [
-      72.6885,
-      19.5945
+      72.7488,
+      20.1114
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1389,12 +1389,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Pingalsai",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1400000,
     "totalPrice": 224000000,
     "coordinates": [
-      73.4229,
-      18.5941
+      73.1215,
+      18.4861
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -1407,12 +1407,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Onde",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 85000,
     "totalPrice": 13600000,
     "coordinates": [
-      72.884,
-      19.309
+      73.0717,
+      19.8291
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1425,12 +1425,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Vangani",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 68000,
     "totalPrice": 27200000,
     "coordinates": [
-      73.0438,
-      18.6418
+      73.3201,
+      19.0772
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1447,8 +1447,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 91000,
     "totalPrice": 27300000,
     "coordinates": [
-      73.1543,
-      19.6069
+      72.7224,
+      19.707
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -1461,12 +1461,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Kolad",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 112000,
     "totalPrice": 67200000,
     "coordinates": [
-      72.9304,
-      18.7641
+      73.343,
+      18.424
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -1483,8 +1483,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 81000,
     "totalPrice": 3888000,
     "coordinates": [
-      72.8461,
-      19.2482
+      72.7573,
+      19.7966
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -1497,12 +1497,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Dadarpada",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 100000,
     "totalPrice": 12000000,
     "coordinates": [
-      73.2037,
-      18.3136
+      73.1489,
+      18.7162
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -1519,8 +1519,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 71000,
     "totalPrice": 3408000,
     "coordinates": [
-      72.6622,
-      19.2396
+      73.1272,
+      19.779
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -1537,8 +1537,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 350000,
     "totalPrice": 105000000,
     "coordinates": [
-      73.0337,
-      18.6255
+      72.8783,
+      18.7607
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -1551,12 +1551,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Posheri",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 60000,
     "totalPrice": 19200000,
     "coordinates": [
-      72.7149,
-      19.7753
+      73.1382,
+      19.7088
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1569,12 +1569,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Pingalsai",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 65000,
     "totalPrice": 10400000,
     "coordinates": [
-      73.2944,
-      18.3532
+      73.1227,
+      18.4911
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -1587,12 +1587,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Alonde",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 116000,
     "totalPrice": 46400000,
     "coordinates": [
-      73.1277,
-      19.6639
+      73.126,
+      19.7746
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -1605,12 +1605,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Gherasudhagad",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 87000,
     "totalPrice": 17400000,
     "coordinates": [
-      73.2685,
-      18.3483
+      73.1894,
+      18.8657
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1627,8 +1627,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 86000,
     "totalPrice": 5160000,
     "coordinates": [
-      73.1472,
-      19.5449
+      72.7161,
+      19.7264
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -1641,12 +1641,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Deoghar",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 74000,
     "totalPrice": 23680000,
     "coordinates": [
-      73.4318,
-      18.7311
+      73.1509,
+      18.1602
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -1659,12 +1659,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Satpati",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 74000,
     "totalPrice": 35520000,
     "coordinates": [
-      72.7973,
-      19.3256
+      72.715,
+      19.7287
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -1677,12 +1677,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Deoghar",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 118000,
     "totalPrice": 47200000,
     "coordinates": [
-      73.0818,
-      18.7677
+      73.1475,
+      18.1518
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1699,8 +1699,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1400000,
     "totalPrice": 268800000,
     "coordinates": [
-      72.8178,
-      19.2808
+      72.8852,
+      20.1206
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -1717,8 +1717,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 64000,
     "totalPrice": 3072000,
     "coordinates": [
-      73.312,
-      18.3599
+      73.1316,
+      18.7717
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1735,8 +1735,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 102000,
     "totalPrice": 19584000,
     "coordinates": [
-      72.6603,
-      19.4137
+      72.7723,
+      19.8989
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1753,8 +1753,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 114000,
     "totalPrice": 11400000,
     "coordinates": [
-      73.2121,
-      18.5583
+      73.1686,
+      18.1273
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -1771,8 +1771,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 74000,
     "totalPrice": 10360000,
     "coordinates": [
-      72.7883,
-      19.3146
+      73.1877,
+      19.6864
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -1785,12 +1785,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Kashipur",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 63000,
     "totalPrice": 20160000,
     "coordinates": [
-      73.3232,
-      18.4341
+      73.0965,
+      18.742
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1807,8 +1807,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 52000,
     "totalPrice": 12896000,
     "coordinates": [
-      72.8277,
-      19.6828
+      73.1515,
+      19.702
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -1821,12 +1821,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Kashipur",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 75000,
     "totalPrice": 24000000,
     "coordinates": [
-      72.9127,
-      18.3319
+      73.0919,
+      18.7401
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1839,12 +1839,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Vangaon",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 53000,
     "totalPrice": 25440000,
     "coordinates": [
-      72.9944,
-      19.7109
+      72.7798,
+      19.8987
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -1857,12 +1857,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Lep",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 72000,
     "totalPrice": 5760000,
     "coordinates": [
-      73.1666,
-      18.9587
+      73.1823,
+      18.1818
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -1879,8 +1879,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 46000,
     "totalPrice": 11408000,
     "coordinates": [
-      73.1367,
-      19.2062
+      72.9132,
+      19.7366
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1893,12 +1893,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Uppal",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 117000,
     "totalPrice": 23400000,
     "coordinates": [
-      73.2511,
-      18.7173
+      72.9213,
+      18.6622
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -1911,12 +1911,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Satpati",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 115000,
     "totalPrice": 69000000,
     "coordinates": [
-      72.8332,
-      19.793
+      72.7131,
+      19.7212
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -1929,12 +1929,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Kolad",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 350000,
     "totalPrice": 140000000,
     "coordinates": [
-      72.9287,
-      18.4853
+      73.3305,
+      18.4218
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -1947,12 +1947,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Kudus",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 750000,
     "totalPrice": 60000000,
     "coordinates": [
-      72.9319,
-      19.5826
+      73.1007,
+      19.608
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -1965,12 +1965,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Tambati",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 98000,
     "totalPrice": 11760000,
     "coordinates": [
-      73.0201,
-      18.3498
+      73.1646,
+      18.696
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -1983,12 +1983,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 350000,
     "totalPrice": 56000000,
     "coordinates": [
-      73.195,
-      19.5533
+      73.1502,
+      19.6399
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -2001,12 +2001,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Chikhale",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 112000,
     "totalPrice": 44800000,
     "coordinates": [
-      73.1435,
-      18.9448
+      73.1601,
+      18.9811
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2019,12 +2019,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Sambha",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 103000,
     "totalPrice": 12360000,
     "coordinates": [
-      73.0088,
-      19.4064
+      72.9381,
+      20.1616
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -2037,12 +2037,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Amtem",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 350000,
     "totalPrice": 42000000,
     "coordinates": [
-      73.3816,
-      18.9733
+      73.1192,
+      18.7584
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2055,12 +2055,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Alonde",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 45000,
     "totalPrice": 21600000,
     "coordinates": [
-      72.7551,
-      19.6342
+      73.1215,
+      19.7732
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -2073,12 +2073,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Lep",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 95000,
     "totalPrice": 7600000,
     "coordinates": [
-      73.175,
-      18.7443
+      73.1722,
+      18.1712
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -2095,8 +2095,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 53000,
     "totalPrice": 7420000,
     "coordinates": [
-      72.8479,
-      19.7004
+      72.9452,
+      20.1619
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2109,12 +2109,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Tambati",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 110000,
     "totalPrice": 17600000,
     "coordinates": [
-      72.9328,
-      18.3257
+      73.1644,
+      18.6945
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -2127,12 +2127,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Kev",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 40000,
     "totalPrice": 19200000,
     "coordinates": [
-      72.9756,
-      19.5604
+      73.0813,
+      19.7904
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -2149,8 +2149,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 103000,
     "totalPrice": 14420000,
     "coordinates": [
-      73.336,
-      18.7378
+      72.9108,
+      18.5875
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -2163,12 +2163,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 102000,
     "totalPrice": 61200000,
     "coordinates": [
-      73.2339,
-      19.185
+      73.1544,
+      19.653
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2181,12 +2181,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Akshi",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 41000,
     "totalPrice": 3280000,
     "coordinates": [
-      72.9359,
-      18.6866
+      72.8994,
+      18.6213
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -2199,12 +2199,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Alonde",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 1200000,
     "totalPrice": 576000000,
     "coordinates": [
-      73.0732,
-      19.3043
+      73.1276,
+      19.7809
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -2221,8 +2221,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 58000,
     "totalPrice": 5800000,
     "coordinates": [
-      73.4331,
-      18.5685
+      73.1396,
+      18.1802
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -2235,12 +2235,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Murdadi",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 93000,
     "totalPrice": 11160000,
     "coordinates": [
-      73.1226,
-      19.3379
+      72.8174,
+      20.0167
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -2253,12 +2253,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Gherasudhagad",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 115000,
     "totalPrice": 36800000,
     "coordinates": [
-      73.276,
-      18.7059
+      73.1837,
+      18.8636
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -2275,8 +2275,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 109000,
     "totalPrice": 15260000,
     "coordinates": [
-      73.2097,
-      19.364
+      73.2223,
+      19.6675
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -2289,12 +2289,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Nagaon",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1400000,
     "totalPrice": 224000000,
     "coordinates": [
-      73.0709,
-      18.5875
+      72.9072,
+      18.5924
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2311,8 +2311,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 59000,
     "totalPrice": 17700000,
     "coordinates": [
-      72.6722,
-      19.4467
+      72.7111,
+      19.7354
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -2325,12 +2325,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Kashipur",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 52000,
     "totalPrice": 24960000,
     "coordinates": [
-      73.1542,
-      18.6682
+      73.0945,
+      18.7526
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2343,12 +2343,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Mahim",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 1400000,
     "totalPrice": 112000000,
     "coordinates": [
-      72.8531,
-      19.7784
+      72.7474,
+      19.6726
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2361,12 +2361,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Neral",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 108000,
     "totalPrice": 51840000,
     "coordinates": [
-      73.07,
-      18.566
+      73.3244,
+      19.0318
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2383,8 +2383,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 70000,
     "totalPrice": 3360000,
     "coordinates": [
-      73.2026,
-      19.5418
+      72.7367,
+      19.6311
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -2401,8 +2401,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 52000,
     "totalPrice": 3120000,
     "coordinates": [
-      73.2964,
-      18.6106
+      73.1274,
+      18.9442
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -2415,12 +2415,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 95000,
     "totalPrice": 11400000,
     "coordinates": [
-      72.9687,
-      19.2019
+      72.93,
+      20.1351
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2433,12 +2433,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Varsoli",
-    "areaAcres": 2.0,
+    "areaAcres": 2,
     "pricePerGuntha": 1400000,
     "totalPrice": 112000000,
     "coordinates": [
-      73.2899,
-      18.5678
+      72.8792,
+      18.6689
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2455,8 +2455,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 98000,
     "totalPrice": 18816000,
     "coordinates": [
-      72.6556,
-      19.2787
+      72.752,
+      20.105
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -2469,12 +2469,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Tambati",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 750000,
     "totalPrice": 150000000,
     "coordinates": [
-      73.4726,
-      18.9617
+      73.1611,
+      18.6909
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -2487,12 +2487,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Mahim",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 78000,
     "totalPrice": 9360000,
     "coordinates": [
-      72.8808,
-      19.2395
+      72.742,
+      19.6684
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2509,8 +2509,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 77000,
     "totalPrice": 19096000,
     "coordinates": [
-      73.0571,
-      18.9949
+      72.8898,
+      18.7594
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -2527,8 +2527,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 46000,
     "totalPrice": 11408000,
     "coordinates": [
-      73.0971,
-      19.7374
+      72.9203,
+      20.1383
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 85,
@@ -2541,12 +2541,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Nagaon",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 64000,
     "totalPrice": 25600000,
     "coordinates": [
-      73.2867,
-      18.7346
+      72.8971,
+      18.5875
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2563,8 +2563,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 45000,
     "totalPrice": 2700000,
     "coordinates": [
-      72.9145,
-      19.3163
+      72.782,
+      19.8996
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2581,8 +2581,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 81000,
     "totalPrice": 4860000,
     "coordinates": [
-      72.9854,
-      18.8232
+      73.411,
+      18.9863
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -2595,12 +2595,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Pali",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 74000,
     "totalPrice": 14800000,
     "coordinates": [
-      72.8042,
-      19.6813
+      73.1815,
+      19.6803
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2613,12 +2613,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Tambati",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 54000,
     "totalPrice": 25920000,
     "coordinates": [
-      72.9252,
-      18.6278
+      73.1722,
+      18.6877
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -2635,8 +2635,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 750000,
     "totalPrice": 105000000,
     "coordinates": [
-      72.9719,
-      19.1097
+      72.7387,
+      19.6184
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2653,8 +2653,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 87000,
     "totalPrice": 21576000,
     "coordinates": [
-      73.0203,
-      18.3758
+      73.3401,
+      18.8921
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -2667,12 +2667,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Pali",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 48000,
     "totalPrice": 28800000,
     "coordinates": [
-      72.9286,
-      19.5448
+      73.1855,
+      19.6782
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2689,8 +2689,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 250000,
     "totalPrice": 15000000,
     "coordinates": [
-      73.1756,
-      18.5131
+      73.31,
+      18.9717
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -2703,12 +2703,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 109000,
     "totalPrice": 17440000,
     "coordinates": [
-      73.0954,
-      19.3934
+      73.1627,
+      19.6511
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -2721,12 +2721,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Karjat",
     "village": "Neral",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 92000,
     "totalPrice": 44160000,
     "coordinates": [
-      73.0478,
-      18.9573
+      73.3217,
+      19.0173
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -2743,8 +2743,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 86000,
     "totalPrice": 16512000,
     "coordinates": [
-      73.0614,
-      19.1695
+      72.9306,
+      19.9854
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -2757,12 +2757,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Kashipur",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 55000,
     "totalPrice": 8800000,
     "coordinates": [
-      73.3745,
-      18.9643
+      73.0971,
+      18.7377
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -2779,8 +2779,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 42000,
     "totalPrice": 12600000,
     "coordinates": [
-      72.8501,
-      19.1354
+      72.7733,
+      19.9013
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -2797,8 +2797,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 110000,
     "totalPrice": 6600000,
     "coordinates": [
-      73.0096,
-      18.445
+      73.1504,
+      18.5423
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -2815,8 +2815,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 58000,
     "totalPrice": 2784000,
     "coordinates": [
-      72.9741,
-      19.7913
+      72.7044,
+      19.8678
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -2829,12 +2829,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Morbe",
-    "areaAcres": 12.0,
+    "areaAcres": 12,
     "pricePerGuntha": 250000,
     "totalPrice": 120000000,
     "coordinates": [
-      73.3531,
-      18.5508
+      73.1896,
+      18.9203
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2847,12 +2847,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Sakhare",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 1200000,
     "totalPrice": 144000000,
     "coordinates": [
-      72.7182,
-      19.3947
+      73.1355,
+      19.8299
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -2865,12 +2865,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Mhasala",
     "village": "Lep",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 97000,
     "totalPrice": 19400000,
     "coordinates": [
-      73.4472,
-      18.6527
+      73.1796,
+      18.1702
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -2887,8 +2887,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 43000,
     "totalPrice": 8256000,
     "coordinates": [
-      72.9374,
-      19.1426
+      73.193,
+      19.6852
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -2905,8 +2905,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 96000,
     "totalPrice": 18432000,
     "coordinates": [
-      72.9285,
-      18.3514
+      73.3245,
+      19.0308
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2919,12 +2919,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Sakhare",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 114000,
     "totalPrice": 13680000,
     "coordinates": [
-      72.8451,
-      19.4838
+      73.145,
+      19.8275
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -2937,12 +2937,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Dadarpada",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 52000,
     "totalPrice": 10400000,
     "coordinates": [
-      72.9486,
-      18.8552
+      73.1486,
+      18.7075
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -2955,12 +2955,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 69000,
     "totalPrice": 11040000,
     "coordinates": [
-      73.1465,
-      19.3897
+      73.1537,
+      19.637
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -2977,8 +2977,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 72000,
     "totalPrice": 10080000,
     "coordinates": [
-      72.9716,
-      18.562
+      73.314,
+      19.018
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -2995,8 +2995,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 87000,
     "totalPrice": 5220000,
     "coordinates": [
-      72.9838,
-      19.6682
+      73.0996,
+      19.799
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -3013,8 +3013,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 500000,
     "totalPrice": 150000000,
     "coordinates": [
-      73.4447,
-      18.9115
+      73.1298,
+      18.4482
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 120,
@@ -3031,8 +3031,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 53000,
     "totalPrice": 13144000,
     "coordinates": [
-      72.7776,
-      19.5045
+      73.1629,
+      19.7889
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -3049,8 +3049,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 111000,
     "totalPrice": 6660000,
     "coordinates": [
-      73.3376,
-      18.5573
+      72.8732,
+      18.8013
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -3063,12 +3063,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Kelva",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 118000,
     "totalPrice": 47200000,
     "coordinates": [
-      72.984,
-      19.5725
+      72.726,
+      19.6208
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -3085,8 +3085,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1200000,
     "totalPrice": 57600000,
     "coordinates": [
-      73.4329,
-      18.8337
+      73.3443,
+      18.8993
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -3103,8 +3103,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 48000,
     "totalPrice": 11904000,
     "coordinates": [
-      73.0299,
-      19.1993
+      72.7444,
+      20.1024
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -3121,8 +3121,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 98000,
     "totalPrice": 9800000,
     "coordinates": [
-      73.102,
-      18.5386
+      73.3218,
+      19.0846
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -3139,8 +3139,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 59000,
     "totalPrice": 3540000,
     "coordinates": [
-      73.0207,
-      19.2102
+      73.15,
+      19.7061
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -3157,8 +3157,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 117000,
     "totalPrice": 35100000,
     "coordinates": [
-      73.0439,
-      18.6094
+      73.1463,
+      18.7113
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -3171,12 +3171,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Malwada",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 1200000,
     "totalPrice": 192000000,
     "coordinates": [
-      72.942,
-      19.5749
+      73.169,
+      19.776
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -3189,12 +3189,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Chikhale",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 47000,
     "totalPrice": 7520000,
     "coordinates": [
-      73.0609,
-      18.3054
+      73.1551,
+      18.9753
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -3207,12 +3207,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Dahanu",
     "village": "Gholvad",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 40000,
     "totalPrice": 4800000,
     "coordinates": [
-      72.9084,
-      19.4482
+      72.7378,
+      20.0424
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -3225,12 +3225,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Roha",
     "village": "Nagothane",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 85000,
     "totalPrice": 17000000,
     "coordinates": [
-      73.3971,
-      18.3505
+      73.1434,
+      18.5292
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -3243,12 +3243,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Kev",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 500000,
     "totalPrice": 300000000,
     "coordinates": [
-      72.994,
-      19.503
+      73.078,
+      19.796
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -3265,8 +3265,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 81000,
     "totalPrice": 4860000,
     "coordinates": [
-      73.4486,
-      18.4203
+      73.1751,
+      18.1731
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -3279,12 +3279,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 71000,
     "totalPrice": 11360000,
     "coordinates": [
-      72.8903,
-      19.405
+      72.9326,
+      20.1358
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -3301,8 +3301,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1400000,
     "totalPrice": 196000000,
     "coordinates": [
-      73.1863,
-      18.4177
+      73.1687,
+      18.687
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -3315,12 +3315,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Wada",
     "village": "Khandpe",
-    "areaAcres": 15.0,
+    "areaAcres": 15,
     "pricePerGuntha": 84000,
     "totalPrice": 50400000,
     "coordinates": [
-      73.1414,
-      19.6092
+      73.1534,
+      19.6371
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,
@@ -3333,12 +3333,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Panvel",
     "village": "Chikhale",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 1000000,
     "totalPrice": 120000000,
     "coordinates": [
-      73.3355,
-      18.407
+      73.1533,
+      18.972
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 40,
@@ -3351,12 +3351,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Palghar",
     "village": "Satpati",
-    "areaAcres": 10.0,
+    "areaAcres": 10,
     "pricePerGuntha": 114000,
     "totalPrice": 45600000,
     "coordinates": [
-      73.2045,
-      19.4142
+      72.7104,
+      19.732
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -3373,8 +3373,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 120000,
     "totalPrice": 16800000,
     "coordinates": [
-      73.1439,
-      18.5213
+      73.3358,
+      19.0905
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -3391,8 +3391,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1000000,
     "totalPrice": 248000000,
     "coordinates": [
-      72.927,
-      19.1519
+      72.9136,
+      20.1101
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 25,
@@ -3409,8 +3409,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 51000,
     "totalPrice": 3060000,
     "coordinates": [
-      73.1842,
-      18.7305
+      73.1123,
+      18.7385
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -3427,8 +3427,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 113000,
     "totalPrice": 21696000,
     "coordinates": [
-      72.8429,
-      19.5563
+      73.1104,
+      19.6161
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 150,
@@ -3445,8 +3445,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 1400000,
     "totalPrice": 268800000,
     "coordinates": [
-      73.3086,
-      18.5404
+      72.9249,
+      18.6623
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -3463,8 +3463,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 96000,
     "totalPrice": 9600000,
     "coordinates": [
-      73.0159,
-      19.4668
+      72.8201,
+      20.0179
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -3477,12 +3477,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Pen",
     "village": "Dadarpada",
-    "areaAcres": 4.0,
+    "areaAcres": 4,
     "pricePerGuntha": 116000,
     "totalPrice": 18560000,
     "coordinates": [
-      73.2585,
-      18.3367
+      73.1391,
+      18.7117
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 95,
@@ -3495,12 +3495,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Talasari",
     "village": "Dhumal",
-    "areaAcres": 5.0,
+    "areaAcres": 5,
     "pricePerGuntha": 76000,
     "totalPrice": 15200000,
     "coordinates": [
-      73.1609,
-      19.2764
+      72.9314,
+      20.1283
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 220,
@@ -3517,8 +3517,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 58000,
     "totalPrice": 3480000,
     "coordinates": [
-      73.0661,
-      18.9417
+      72.888,
+      18.7305
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 350,
@@ -3535,8 +3535,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 50000,
     "totalPrice": 12400000,
     "coordinates": [
-      72.876,
-      19.3167
+      72.761,
+      19.8034
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 800,
@@ -3549,12 +3549,12 @@ export const properties: Property[] = [
     "district": "Raigad",
     "taluka": "Alibag",
     "village": "Akshi",
-    "areaAcres": 8.0,
+    "areaAcres": 8,
     "pricePerGuntha": 107000,
     "totalPrice": 34240000,
     "coordinates": [
-      73.2823,
-      18.3654
+      72.8909,
+      18.6094
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 180,
@@ -3567,12 +3567,12 @@ export const properties: Property[] = [
     "district": "Palghar",
     "taluka": "Vikramgad",
     "village": "Malwada",
-    "areaAcres": 3.0,
+    "areaAcres": 3,
     "pricePerGuntha": 350000,
     "totalPrice": 42000000,
     "coordinates": [
-      73.1097,
-      19.3392
+      73.1611,
+      19.7745
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 70,
@@ -3589,8 +3589,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 52000,
     "totalPrice": 3120000,
     "coordinates": [
-      73.2039,
-      18.6554
+      72.8795,
+      18.6644
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 500,
@@ -3607,8 +3607,8 @@ export const properties: Property[] = [
     "pricePerGuntha": 119000,
     "totalPrice": 16660000,
     "coordinates": [
-      72.876,
-      19.1917
+      73.1178,
+      19.7703
     ],
     "verificationStatus": "unverified",
     "roadDistanceMeters": 55,

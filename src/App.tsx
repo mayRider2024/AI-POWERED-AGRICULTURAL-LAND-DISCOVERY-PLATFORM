@@ -35,9 +35,11 @@ function AppRoutes() {
   if (loading) {
     return (
       <div className="min-h-[100dvh] w-full bg-[#FFF3E3] flex flex-col items-center justify-center p-6 text-center space-y-3">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#E86A17] to-[#C54E12] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#E86A17]/25 animate-pulse">
-          L
-        </div>
+        <img
+          src="/logo.png"
+          alt="LandLens AI"
+          className="w-16 h-16 rounded-2xl object-cover shadow-lg shadow-[#E86A17]/25 animate-pulse"
+        />
         <p className="text-xs font-bold text-[#6B5E54]">Loading LandLens AI...</p>
       </div>
     );

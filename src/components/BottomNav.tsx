@@ -6,19 +6,20 @@ export default function BottomNav() {
   const { t } = useTranslation();
 
   const navItems = [
-    { to: '/home', icon: Home, label: t('nav.home') },
-    { to: '/explore', icon: Compass, label: t('nav.explore') },
-    { to: '/saved', icon: Bookmark, label: t('nav.saved') },
-    { to: '/assistant', icon: Sparkles, label: t('nav.aiSearch') },
-    { to: '/profile', icon: User, label: t('nav.profile') },
+    { to: '/home', icon: Home, label: t('nav.home'), id: 'nav-home' },
+    { to: '/explore', icon: Compass, label: t('nav.explore'), id: 'nav-explore' },
+    { to: '/saved', icon: Bookmark, label: t('nav.saved'), id: 'nav-saved' },
+    { to: '/assistant', icon: Sparkles, label: t('nav.aiSearch'), id: 'nav-assistant' },
+    { to: '/profile', icon: User, label: t('nav.profile'), id: 'nav-profile' },
   ];
 
   return (
     <nav className="bg-[#FFFDFB] border-t border-[#F2DCC4] flex justify-around items-center px-2 py-2 safe-area-bottom flex-shrink-0 z-40 shadow-[0_-2px_12px_rgba(232,106,23,0.06)] select-none">
-      {navItems.map(({ to, icon: Icon, label }) => (
+      {navItems.map(({ to, icon: Icon, label, id }) => (
         <NavLink
           key={to}
           to={to}
+          id={id}
           className={({ isActive }) =>
             `flex flex-col items-center justify-center flex-1 py-1 rounded-xl no-underline transition-all active:scale-95 ${
               isActive
