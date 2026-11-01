@@ -21,8 +21,9 @@ class InterpretedFilters(BaseModel):
     village: Optional[str] = None
     survey_number: Optional[str] = None
     land_type: Optional[str] = None
-    min_area_acres: Optional[float] = None
-    max_area_acres: Optional[float] = None
+    exact_area_acres: Optional[float] = Field(None, description="Exact acreage when specified without bounding keywords (e.g. '10 acres', '10-acre', '10 acre', 'exactly 10 acres')")
+    min_area_acres: Optional[float] = Field(None, description="Minimum acreage ONLY when explicit minimum keywords are used (e.g. 'at least', 'minimum', '10 acres or more', 'no less than')")
+    max_area_acres: Optional[float] = Field(None, description="Maximum acreage when explicit maximum keywords are used (e.g. 'under', 'maximum', 'at most', 'less than', 'up to')")
     min_area_strict: Optional[bool] = False
     max_area_strict: Optional[bool] = False
     min_price_per_guntha: Optional[float] = None

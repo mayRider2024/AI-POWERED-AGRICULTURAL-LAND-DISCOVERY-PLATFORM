@@ -50,9 +50,22 @@ def test_property_routes_public_sanitized():
         assert "owner_email" not in prop
         assert "aadhar" not in prop
 
-def test_ai_search_rate_limiting():
+def test_ai_search_rate_limiting(monkeypatch):
     """Verify that exceeding rate limit returns HTTP 429 Too Many Requests."""
     from app.core.rate_limit import ai_rate_limiter
+    from app.schemas.ai_search import AISearchResponse, InterpretedFilters
+
+    # Mock perform_ai_search so rate limiting test is fast and independent of external LLM latency
+    mock_resp = AISearchResponse(
+        original_query="test",
+        interpreted_filters=InterpretedFilters(),
+        matching_count=0,
+        properties=[],
+        explanation="mocked",
+        demo_notice="Demo data – unverified.",
+    )
+    monkeypatch.setattr("app.api.routes.ai_routes.perform_ai_search", lambda req, db: mock_resp)
+
     # Reset limiter state for test client IP
     test_ip = "192.0.2.1"
     ai_rate_limiter._requests[test_ip] = []

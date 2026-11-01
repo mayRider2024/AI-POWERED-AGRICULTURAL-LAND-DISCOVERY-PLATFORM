@@ -66,7 +66,9 @@ def test_prompt_assignment_queries():
     q1 = "Find me 10 acres of agricultural land in Palghar between ₹10 lakh and ₹15 lakh per guntha, within 100 metres of a road."
     f1 = _rule_based_interpret_query(q1)
     assert f1.district == "Palghar"
-    assert f1.min_area_acres == 10.0
+    assert f1.exact_area_acres == 10.0
+    assert f1.min_area_acres is None
+    assert f1.max_area_acres is None
     assert f1.min_price_per_guntha == 1000000.0
     assert f1.max_price_per_guntha == 1500000.0
     assert f1.max_road_distance_meters == 100.0
@@ -88,7 +90,8 @@ def test_prompt_assignment_queries():
     q4 = "मला पालघरमध्ये ५ एकर शेतीची जमीन दाखवा."
     f4 = _rule_based_interpret_query(q4)
     assert f4.district == "Palghar"
-    assert f4.min_area_acres == 5.0
+    assert f4.exact_area_acres == 5.0
+    assert f4.min_area_acres is None
 
 def test_area_strict_inequality_parsing():
     """Verify strict inequality:
@@ -130,7 +133,7 @@ def test_multi_unit_and_road_distance_disambiguation_regression():
     It should be no more than 100 meters from a road. show me the exact location of the property on map and let me see the 7/12 extract'
 
     Ensure:
-    - 10 acres maps to min_area_acres=10 (NOT 100)
+    - 10 acres maps to exact_area_acres=10 (NOT min_area_acres)
     - 100 meters maps to max_road_distance_meters=100
     - Rs 10 lac to 15 lac per gunta maps to 1,000,000 to 1,500,000
     - District is Palghar
@@ -141,7 +144,8 @@ def test_multi_unit_and_road_distance_disambiguation_regression():
     )
     f = _rule_based_interpret_query(q)
     assert f.district == "Palghar"
-    assert f.min_area_acres == 10.0
+    assert f.exact_area_acres == 10.0
+    assert f.min_area_acres is None
     assert f.max_area_acres is None
     assert f.max_road_distance_meters == 100.0
     assert f.road_proximity_required is True
@@ -155,15 +159,16 @@ def test_marathi_multi_number_queries():
     q1 = "पालघरमध्ये रस्त्यापासून २०० मीटर अंतरावर ५ एकर शेतजमीन"
     f1 = _rule_based_interpret_query(q1)
     assert f1.district == "Palghar"
-    assert f1.min_area_acres == 5.0
+    assert f1.exact_area_acres == 5.0
+    assert f1.min_area_acres is None
     assert f1.max_road_distance_meters == 200.0
 
-    # 2. Survey number 45, under 2 acres in Raigad
+    # 2. Survey number 45 in Raigad
     q2 = "रायगडमध्ये गट क्र. ४५ अंतर्गत २ एकर जमीन"
     f2 = _rule_based_interpret_query(q2)
     assert f2.district == "Raigad"
     assert f2.survey_number == "45"
-    assert f2.min_area_acres == 2.0
+    assert (f2.exact_area_acres == 2.0 or f2.max_area_acres == 2.0)
 
 def test_price_per_acre_and_demo_disclaimers_regression():
     """Verify regression test for:

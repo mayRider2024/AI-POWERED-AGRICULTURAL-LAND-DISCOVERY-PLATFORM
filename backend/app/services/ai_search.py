@@ -99,6 +99,7 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         road_req = True
 
     # Area parsing (acres / एकर / gunthas / गुंठा)
+    exact_area = None
     min_area = None
     min_area_strict = False
     max_area = None
@@ -119,10 +120,17 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         max_area = float(area_range.group(2))
     else:
         # Unit MUST be explicitly present - never make unit optional to prevent capturing road distance or prices!
-        area_at_least = re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
-        area_above = re.search(rf'(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
-        area_under = re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
-        area_exact = re.search(rf'\b(\d+(?:\.\d+)?)\s*{area_unit}\b', q_trans)
+        area_at_least = (
+            re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
+            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक)', q_trans)
+        )
+        area_above = re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_under = (
+            re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q_trans) or
+            re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी)', q_trans)
+        )
+        area_explicit_exact = re.search(rf'(?:exact(?:ly)?\s+)(\d+(?:\.\d+)?)\s*{area_unit}', q_trans)
+        area_standard_exact = re.search(rf'\b(\d+(?:\.\d+)?)\s*{area_unit}\b', q_trans)
 
         if area_at_least:
             min_area = float(area_at_least.group(1))
@@ -132,11 +140,11 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
             min_area_strict = True
         elif area_under:
             max_area = float(area_under.group(1))
-            max_area_strict = True
-        elif area_exact:
-            # "10 acres of land", "10 acre agricultural land"
-            min_area = float(area_exact.group(1))
-            min_area_strict = False
+            max_area_strict = False if any(kw in area_under.group(0) for kw in ["up to", "at most", "maximum", "max", "no more than", "पर्यंत"]) else True
+        elif area_explicit_exact:
+            exact_area = float(area_explicit_exact.group(1))
+        elif area_standard_exact:
+            exact_area = float(area_standard_exact.group(1))
 
     # Price per guntha parsing (e.g. "between ₹10 lakh and ₹15 lakh per guntha", "Rs 10 lac per gunta to Rs 15 lac a gunta", "₹50000 per guntha")
     min_price_per_guntha = None
@@ -184,6 +192,7 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         village=None,
         survey_number=survey_number,
         land_type="agricultural",
+        exact_area_acres=exact_area,
         min_area_acres=min_area,
         max_area_acres=max_area,
         min_area_strict=min_area_strict,
@@ -195,6 +204,56 @@ def _rule_based_interpret_query(query: str) -> InterpretedFilters:
         max_road_distance_meters=max_road_distance,
         road_proximity_required=road_req,
     )
+
+def _normalize_acreage_filters(filters: InterpretedFilters, query: str) -> InterpretedFilters:
+    """Ensure acreage semantics strictly adhere to user intent:
+    - If user specifies an acreage without explicit bounding keywords ("at least", "minimum", "10 acres or more", "under", "between", etc.),
+      it must be interpreted as exact acreage (exact_area_acres) with floating-point tolerance.
+    - Only use min_area_acres when the user explicitly says 'at least', 'minimum', or '10 acres or more' (or equivalent).
+    """
+    q = query.lower()
+    marathi_nums = {'०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'}
+    for m_digit, eng_digit in marathi_nums.items():
+        q = q.replace(m_digit, eng_digit)
+
+    area_unit = r'(?:acres?|acre|एकर)'
+    has_range = bool(re.search(rf'(?:between\s+)?(\d+(?:\.\d+)?)\s*(?:-|to|and|ते)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q))
+    has_explicit_min = bool(
+        re.search(rf'(?:at\s+least|minimum(?:\s+of)?|min\b|no\s+less\s+than|कमीतकमी)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
+        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+more|and\s+above|\+|किंवा\s*अधिक)', q) or
+        re.search(rf'(?<!no\s)(?<!not\s)(?:above|more\s+than|greater\s+than|>|पेक्षा\s+जास्त)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q)
+    )
+    has_explicit_max = bool(
+        re.search(rf'(?:under|less\s+than|below|no\s+more\s+than|up\s+to|at\s+most|maximum(?:\s+of)?|max\b|<|पेक्षा\s+कमी|पर्यंत)\s*(\d+(?:\.\d+)?)\s*{area_unit}', q) or
+        re.search(rf'(\d+(?:\.\d+)?)\s*{area_unit}\s*(?:or\s+less|and\s+below|किंवा\s*कमी)', q)
+    )
+
+    # If both min and max are set and equal (or within floating point delta), treat as exact
+    if filters.min_area_acres is not None and filters.max_area_acres is not None:
+        if abs(filters.min_area_acres - filters.max_area_acres) < 0.01:
+            filters.exact_area_acres = filters.min_area_acres
+            filters.min_area_acres = None
+            filters.max_area_acres = None
+
+    # If min_area_acres was set by LLM without explicit minimum or range keywords in the query:
+    if filters.exact_area_acres is None and not has_range and not has_explicit_min:
+        if filters.min_area_acres is not None and filters.max_area_acres is None:
+            filters.exact_area_acres = filters.min_area_acres
+            filters.min_area_acres = None
+
+    # If max_area_acres was set without explicit max or range keywords:
+    if filters.exact_area_acres is None and not has_range and not has_explicit_max:
+        if filters.max_area_acres is not None and filters.min_area_acres is None:
+            filters.exact_area_acres = filters.max_area_acres
+            filters.max_area_acres = None
+
+    # If explicit minimum was requested, ensure exact_area_acres is NOT set
+    if has_explicit_min and filters.exact_area_acres is not None:
+        if filters.min_area_acres is None:
+            filters.min_area_acres = filters.exact_area_acres
+        filters.exact_area_acres = None
+
+    return filters
 
 def _interpret_query(query: str, history: Optional[List[Any]] = None) -> InterpretedFilters:
     if settings.GEMINI_API_KEY:
@@ -217,15 +276,19 @@ def _interpret_query(query: str, history: Optional[List[Any]] = None) -> Interpr
                     context_section = "Prior conversation context:\n" + "\n".join(history_lines) + "\n\n"
 
             prompt = (
-                "Extract structured search filters from this Indian agricultural land query in English, Hindi, or Marathi. "
-                "CRITICAL INSTRUCTIONS ON UNITS AND CONSTRAINTS: "
-                "- Never confuse road distance with land acreage. '100 meters from a road' -> max_road_distance_meters = 100. "
-                "- '10 acre land' -> min_area_acres = 10. Do not assign distance in meters to acreage. "
-                "- 'Rs 10 lac per gunta to Rs 15 lac a gunta' -> min_price_per_guntha = 1000000, max_price_per_guntha = 1500000. "
-                "District options: 'Raigad' or 'Palghar'. "
-                "Note: Panvel is a taluka in Raigad. 1 lakh/lac = 100,000 INR and 1 crore = 10,000,000 INR. 1 acre = 40 gunthas. "
-                "Extract survey_number if mentioned (e.g., '125/2', 'R-001', 'P-001'). "
-                "Extract max_road_distance_meters if road proximity is specified (e.g., 'within 100 metres of a road', 'no more than 100 meters from a road'). "
+                "Extract structured search filters from this Indian agricultural land query in English, Hindi, or Marathi.\n"
+                "CRITICAL INSTRUCTIONS ON ACREAGE INTERPRETATION:\n"
+                "- When the query mentions an acreage without bounding terms (e.g., '10 acres', '10 acre', '10-acre', 'exactly 10 acres', '१० एकर'), "
+                "set exact_area_acres = 10.0. Leave min_area_acres and max_area_acres as null.\n"
+                "- ONLY set min_area_acres when the query explicitly uses minimum terminology: 'at least', 'minimum', '10 acres or more', 'no less than', 'कमीतकमी', 'किंवा अधिक'. Set min_area_strict=true only if 'more than' or 'above' or 'greater than' is used.\n"
+                "- ONLY set max_area_acres when the query explicitly uses maximum terminology: 'under', 'less than', 'below', 'up to', 'maximum', 'at most', 'कमी', 'पर्यंत'. Set max_area_strict=true only if 'less than' or 'under' or 'below' is used.\n"
+                "- For ranges (e.g., 'between 8 and 12 acres', '8 to 12 acres', '८ ते १२ एकर'): set min_area_acres = 8.0 and max_area_acres = 12.0. Leave exact_area_acres as null.\n"
+                "- Never confuse road distance with land acreage. '100 meters from a road' -> max_road_distance_meters = 100. Do not assign distance in meters to acreage.\n"
+                "- 'Rs 10 lac per gunta to Rs 15 lac a gunta' or 'between ₹10 lakh and ₹15 lakh per guntha' -> min_price_per_guntha = 1000000, max_price_per_guntha = 1500000.\n"
+                "District options: 'Raigad' or 'Palghar'.\n"
+                "Note: Panvel is a taluka in Raigad. 1 lakh/lac = 100,000 INR and 1 crore = 10,000,000 INR. 1 acre = 40 gunthas.\n"
+                "Extract survey_number if mentioned (e.g., '125/2', 'R-001', 'P-001').\n"
+                "Extract max_road_distance_meters if road proximity is specified (e.g., 'within 100 metres of a road', 'no more than 100 meters from a road').\n"
                 "If the query references previous constraints from conversation context (e.g. 'what about under 20 lakh instead?' or 'in Panvel now'), merge and update the filters accordingly.\n\n"
                 f"{context_section}"
                 f"Current User Query: {query}"
@@ -241,7 +304,8 @@ def _interpret_query(query: str, history: Optional[List[Any]] = None) -> Interpr
             )
             json_text = response.candidates[0].content.parts[0].text
             data = json.loads(json_text)
-            return InterpretedFilters.model_validate(data)
+            filters = InterpretedFilters.model_validate(data)
+            return _normalize_acreage_filters(filters, query)
         except Exception:
             # Fallback to local rule-based NLP parser on quota/permission error
             return _rule_based_interpret_query(query)
@@ -257,6 +321,13 @@ def _apply_filters(db: Session, filters: InterpretedFilters) -> List[PropertyLis
         query = query.join(Village).filter(Village.name.ilike(filters.village))
     if filters.survey_number:
         query = query.filter(PropertyListing.survey_number.ilike(f"%{filters.survey_number}%"))
+
+    # Exact acreage with small floating-point tolerance (±0.05 acres)
+    if filters.exact_area_acres is not None:
+        query = query.filter(
+            PropertyListing.area_acres >= filters.exact_area_acres - 0.05,
+            PropertyListing.area_acres <= filters.exact_area_acres + 0.05,
+        )
     if filters.min_area_acres is not None:
         if filters.min_area_strict:
             query = query.filter(PropertyListing.area_acres > filters.min_area_acres)
@@ -302,10 +373,32 @@ def _diagnose_unmet_constraints(db: Session, filters: InterpretedFilters) -> Lis
         if q.count() == 0:
             unmet.append("No properties found within the specified price per guntha range.")
     # Check area
-    if filters.min_area_acres:
-        area_count = db.query(PropertyListing).filter(PropertyListing.area_acres >= filters.min_area_acres).count()
+    if filters.exact_area_acres is not None:
+        area_count = db.query(PropertyListing).filter(
+            PropertyListing.area_acres >= filters.exact_area_acres - 0.05,
+            PropertyListing.area_acres <= filters.exact_area_acres + 0.05,
+        ).count()
         if area_count == 0:
-            unmet.append(f"No properties found with at least {filters.min_area_acres:g} acres.")
+            unmet.append(f"No properties found with exactly {filters.exact_area_acres:g} acres.")
+    elif filters.min_area_acres is not None or filters.max_area_acres is not None:
+        q = db.query(PropertyListing)
+        if filters.min_area_acres is not None:
+            if filters.min_area_strict:
+                q = q.filter(PropertyListing.area_acres > filters.min_area_acres)
+            else:
+                q = q.filter(PropertyListing.area_acres >= filters.min_area_acres)
+        if filters.max_area_acres is not None:
+            if filters.max_area_strict:
+                q = q.filter(PropertyListing.area_acres < filters.max_area_acres)
+            else:
+                q = q.filter(PropertyListing.area_acres <= filters.max_area_acres)
+        if q.count() == 0:
+            if filters.min_area_acres and filters.max_area_acres:
+                unmet.append(f"No properties found between {filters.min_area_acres:g} and {filters.max_area_acres:g} acres.")
+            elif filters.min_area_acres:
+                unmet.append(f"No properties found with at least {filters.min_area_acres:g} acres.")
+            else:
+                unmet.append(f"No properties found under {filters.max_area_acres:g} acres.")
     # If individual constraints have hits but combined is empty
     if not unmet:
         unmet.append("No single property satisfies all combined criteria simultaneously (district, acreage, road distance, and price).")
